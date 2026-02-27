@@ -1,0 +1,180 @@
+/* === NAVBAR ROOT === */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3.5rem;
+  z-index: 40;
+  backdrop-filter: blur(14px);
+  background: rgba(2, 6, 23, 0.86); /* deep dark with blur */
+  border-bottom: 1px solid #1f2937; /* slate-800 */
+}
+
+/* Inner container */
+.navbar-inner {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Brand (logo + name) */
+.navbar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.navbar-logo-circle {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 999px;
+  border: 1px solid rgba(20, 184, 166, 0.6); /* accent */
+  background: radial-gradient(
+    circle at 30% 20%,
+    rgba(20, 184, 166, 0.35),
+    rgba(15, 23, 42, 0.95)
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #14b8a6;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.navbar-title {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-size: 0.95rem;
+  color: #e5e7eb;
+}
+
+.navbar-title span {
+  color: #14b8a6;
+}
+
+/* === DESKTOP LINKS === */
+.nav-links {
+  display: none;
+  align-items: center;
+  gap: 2rem;
+}
+
+.nav-link-btn {
+  border: none;
+  background: none;
+  color: #cbd5f5;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+  position: relative;
+  transition: color 0.15s ease;
+}
+
+.nav-link-btn::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -0.3rem;
+  height: 2px;
+  width: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #14b8a6, #22d3ee);
+  transition: width 0.18s ease;
+}
+
+.nav-link-btn:hover {
+  color: #14b8a6;
+}
+
+.nav-link-btn:hover::after {
+  width: 100%;
+}
+
+/* Social icons on the right */
+.nav-icons {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.nav-icon-link {
+  color: #cbd5f5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease, transform 0.12s ease;
+}
+
+.nav-icon-link:hover {
+  color: #14b8a6;
+  transform: translateY(-1px);
+}
+
+/* === MOBILE MENU BUTTON === */
+.nav-menu-btn {
+  border: none;
+  background: none;
+  color: #e5e7eb;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Show desktop nav on md+ */
+@media (min-width: 768px) {
+  .nav-links {
+    display: flex;
+  }
+
+  .nav-menu-btn {
+    display: none;
+  }
+}
+
+/* === MOBILE DROPDOWN === */
+.nav-mobile {
+  display: none;
+  background: rgba(2, 6, 23, 0.97);
+  border-top: 1px solid #1f2937;
+}
+
+.nav-mobile.open {
+  display: block;
+}
+
+.nav-mobile-inner {
+  padding: 0.75rem 0 0.85rem;
+}
+
+.nav-mobile-btn {
+  width: 100%;
+  border: none;
+  background: none;
+  padding: 0.45rem 0;
+  text-align: left;
+  font-size: 0.9rem;
+  color: #e5e7eb;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.nav-mobile-btn:hover {
+  color: #14b8a6;
+}
+
+/* === UTIL: container (if not already defined globally) === */
+/* If you already have .container in index.css, skip this. */
+.container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}

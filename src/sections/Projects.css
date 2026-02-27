@@ -1,0 +1,358 @@
+/* === SECTION HEADER === */
+.section-header {
+  text-align: center;
+  margin-bottom: 5rem;
+}
+
+.section-title {
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  font-weight: 900;
+  background: linear-gradient(135deg, #f9fafb 0%, #14b8a6 50%, #22d3ee 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1rem;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #14b8a6, #22d3ee);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.section-subtitle {
+  font-size: 1.25rem;
+  color: #d1d5db;
+  max-width: 42rem;
+  margin: 0 auto;
+  line-height: 1.8;
+}
+
+/* === PROJECT GRID === */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 2.5rem;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* === PROJECT CARD === */
+.project-card {
+  background: rgba(15, 23, 42, 0.9);
+  border-radius: 2rem;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid rgba(31, 41, 55, 0.6);
+  backdrop-filter: blur(15px);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.5s ease;
+}
+
+.card-visual {
+  height: 220px;
+  position: relative;
+  overflow: hidden;
+}
+
+.visual-bg {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.8s ease;
+}
+
+.project-card:hover .visual-bg {
+  transform: scale(1.15) rotate(2deg);
+}
+
+.visual-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.15), rgba(34, 211, 238, 0.1));
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.project-card:hover .visual-overlay {
+  opacity: 1;
+}
+
+.project-header {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.4s ease;
+}
+
+.project-card:hover .project-header {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.project-header h3 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #f9fafb;
+}
+
+.project-header p {
+  font-size: 0.9rem;
+  color: #a5f3fc;
+}
+
+/* === CARD BODY === */
+.card-body {
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.stack-preview {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.tech-preview {
+  font-size: 0.75rem;
+  color: #a5f3fc;
+  padding: 0.3rem 0.8rem;
+  background: rgba(20, 184, 166, 0.2);
+  border-radius: 1rem;
+  border: 1px solid rgba(20, 184, 166, 0.4);
+  font-weight: 600;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: auto;
+}
+
+.explore-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: #14b8a6;
+}
+
+/* === DETAIL VIEW === */
+.projects-detail {
+  padding: 5rem 2rem;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(31, 41, 55, 0.6);
+  background: rgba(15, 23, 42, 0.8);
+  color: #9ca3af;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  background: rgba(20, 184, 166, 0.1);
+  color: #14b8a6;
+  border-color: #14b8a6;
+}
+
+.detail-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+@media (max-width: 1024px) {
+  .detail-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.detail-media {
+  position: relative;
+  height: 500px;
+  border-radius: 2rem;
+  overflow: hidden;
+  box-shadow: 0 40px 80px rgba(15, 23, 42, 0.9);
+}
+
+.hero-image {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  border-radius: 2rem;
+}
+
+.image-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.2), rgba(34, 211, 238, 0.15));
+}
+
+.detail-content h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 900;
+  background: linear-gradient(135deg, #f9fafb 0%, #14b8a6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1rem;
+}
+
+.project-subtitle {
+  font-size: 1.1rem;
+  color: #a5f3fc;
+  font-weight: 600;
+  margin-bottom: 2rem;
+}
+
+.project-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.85);
+  border-radius: 1rem;
+  border: 1px solid rgba(31, 41, 55, 0.6);
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #14b8a6;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-weight: 600;
+}
+
+.detail-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.detail-section h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #f9fafb;
+  border-bottom: 2px solid rgba(20, 184, 166, 0.3);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.highlights-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .highlights-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.highlight-card {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.85);
+  border-radius: 1rem;
+  border: 1px solid rgba(31, 41, 55, 0.6);
+  transition: all 0.3s ease;
+}
+
+.highlight-number {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #14b8a6, #22d3ee);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+/* === STACK CHIPS === */
+.stack-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.stack-chip {
+  padding: 0.5rem 1rem;
+  border-radius: 1.25rem;
+  background: rgba(20, 184, 166, 0.2);
+  border: 1px solid rgba(20, 184, 166, 0.4);
+  font-weight: 600;
+  color: #14b8a6;
+  transition: all 0.3s ease;
+  cursor: default;
+}
+
+/* === DETAIL ACTION BUTTONS === */
+.detail-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.action-btn.github {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(31, 41, 55, 0.6);
+  color: #f9fafb;
+}
+
+.action-btn.github:hover {
+  background: #111827;
+  border-color: #14b8a6;
+  color: #14b8a6;
+}
+
+.action-btn.live {
+  background: #14b8a6;
+  color: #f9fafb;
+}
+
+.action-btn.live:hover {
+  background: #0d9488;
+}
