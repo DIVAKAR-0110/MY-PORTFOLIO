@@ -10,7 +10,7 @@ const contentItems = [
   {
     title: "Backend & System Design Breakdowns",
     icon: FiEdit3,
-    image: { a1 }, // add your thumbnail here
+    image: a1, // add your thumbnail here
     description:
       "Threads and deep‑dives explaining Spring Boot, Django, JWT‑based auth, and system design patterns in simple, visual ways.",
     tags: ["Spring Boot", "Django", "System Design"],
@@ -19,7 +19,7 @@ const contentItems = [
   {
     title: "AI & Deep Learning Simplified",
     icon: FiYoutube,
-    image: { b1 },
+    image: b1,
     description:
       "Short video explainers and walkthroughs of TensorFlow models, computer vision pipelines, and practical AI projects.",
     tags: ["TensorFlow", "OpenCV", "Face Recognition"],
@@ -28,7 +28,7 @@ const contentItems = [
   {
     title: "Live Coding & Project Walkthroughs",
     icon: FiMic,
-    image: { c1 },
+    image: c1,
     description:
       "Screen‑recorded sessions building REST APIs, dashboards, and complaint/retail systems from scratch.",
     tags: ["REST APIs", "Dashboards", "Full‑Stack"],
