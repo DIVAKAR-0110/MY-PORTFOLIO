@@ -2,12 +2,15 @@
 import "./ContentCreator.css";
 import { motion } from "framer-motion";
 import { FiYoutube, FiEdit3, FiMic } from "react-icons/fi";
+import a1 from "../assets/App-development-insights.jpg";
+import b1 from "../assets/do-ai-machine-learning.png";
+import c1 from "../assets/live-project.jpg";
 
 const contentItems = [
   {
     title: "Backend & System Design Breakdowns",
     icon: FiEdit3,
-    image: "/images/content/backend-system.jpg", // add your thumbnail here
+    image: { a1 }, // add your thumbnail here
     description:
       "Threads and deep‑dives explaining Spring Boot, Django, JWT‑based auth, and system design patterns in simple, visual ways.",
     tags: ["Spring Boot", "Django", "System Design"],
@@ -16,7 +19,7 @@ const contentItems = [
   {
     title: "AI & Deep Learning Simplified",
     icon: FiYoutube,
-    image: "/images/content/ai-deeplearning.jpg",
+    image: { b1 },
     description:
       "Short video explainers and walkthroughs of TensorFlow models, computer vision pipelines, and practical AI projects.",
     tags: ["TensorFlow", "OpenCV", "Face Recognition"],
@@ -25,7 +28,7 @@ const contentItems = [
   {
     title: "Live Coding & Project Walkthroughs",
     icon: FiMic,
-    image: "/images/content/live-coding.jpg",
+    image: { c1 },
     description:
       "Screen‑recorded sessions building REST APIs, dashboards, and complaint/retail systems from scratch.",
     tags: ["REST APIs", "Dashboards", "Full‑Stack"],
