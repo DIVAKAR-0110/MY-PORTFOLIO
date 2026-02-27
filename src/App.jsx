@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "./components/Navbar";
 import BackgroundOrbs from "./components/BackgroundOrbs";
-import Hero from "./sections/hero";
+import Hero from "./sections/Hero";
 import TechStack from "./sections/TechStack";
 import Projects from "./sections/Projects";
 import ContentCreator from "./sections/ContentCreator";
