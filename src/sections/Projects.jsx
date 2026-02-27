@@ -8,6 +8,7 @@ import {
   FiArrowRight,
   FiArrowLeft,
 } from "react-icons/fi";
+import g1 from "../assets/SSRETAILS.png";
 
 const projects = [
   {
@@ -40,7 +41,7 @@ const projects = [
       "70% faster billing process",
     ],
     stack: ["Django", "PostgreSQL", "Tailwind", "JavaScript"],
-    image: "/images/projects/ssretails-1.jpg",
+    image: g1,
     gradient: "from-emerald-500 to-teal-500",
     github: "",
     live: "",
