@@ -1,17 +1,38 @@
 // src/App.jsx
 import { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "./components/Navbar";
 import BackgroundOrbs from "./components/BackgroundOrbs";
 import Hero from "./sections/Hero";
 import TechStack from "./sections/TechStack";
-import Projects from "./sections/Projects";
+import Projects, { projects } from "./sections/Projects";
 import ContentCreator from "./sections/ContentCreator";
 import About from "./sections/About";
 import Timeline from "./sections/Timeline";
 import Contact from "./sections/Contact";
 import Footer from "./sections/Footer";
+import AllProjects from "./sections/AllProjects";
+import ProjectDetail from "./sections/ProjectDetail";
 import "./App.css"; // Add loading styles here
+
+const MainLayout = () => {
+  return (
+    <>
+      <Navbar />
+      <main className="container mx-auto px-4 pt-24 pb-16 space-y-24">
+        <Hero />
+        <TechStack />
+        <Projects />
+        <ContentCreator />
+        <About />
+        <Timeline />
+        <Contact />
+      </main>
+      <Footer />
+    </>
+  );
+};
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -148,7 +169,7 @@ function App() {
     );
   }
 
-  // Main App Content
+  // Main App Content with React Router
   return (
     <>
       <AnimatePresence mode="wait">
@@ -161,17 +182,13 @@ function App() {
           transition={{ duration: 0.6 }}
         >
           <BackgroundOrbs />
-          <Navbar />
-          <main className="container mx-auto px-4 pt-24 pb-16 space-y-24">
-            <Hero />
-            <TechStack />
-            <Projects />
-            <ContentCreator />
-            <About />
-            <Timeline />
-            <Contact />
-          </main>
-          <Footer />
+          <Router>
+            <Routes>
+              <Route path="/" element={<MainLayout />} />
+              <Route path="/projects" element={<AllProjects projects={projects} />} />
+              <Route path="/projects/:id" element={<ProjectDetail projects={projects} />} />
+            </Routes>
+          </Router>
         </motion.div>
       </AnimatePresence>
     </>

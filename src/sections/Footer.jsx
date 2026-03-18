@@ -89,7 +89,7 @@ function Footer() {
                   <FiGithub />
                 </a>
                 <a
-                  href="https://linkedin.com/in/divakar-r"
+                  href="https://www.linkedin.com/in/r-divakar-482212303/"
                   className="footer-social-link"
                   aria-label="LinkedIn"
                 >

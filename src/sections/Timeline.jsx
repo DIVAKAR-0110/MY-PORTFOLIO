@@ -86,7 +86,7 @@ function Timeline() {
         <div className="header-stats">
           <span>5 Milestones</span>
           <span>7.92 CGPA</span>
-          <span>2 Certifications</span>
+          <span>16 Certifications</span>
           <span>1 Internship</span>
         </div>
       </div>

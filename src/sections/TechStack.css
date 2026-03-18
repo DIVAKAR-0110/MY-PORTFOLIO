@@ -1,188 +1,217 @@
 /* === TECH STACK SECTION === */
 .techstack-section {
-  margin-bottom: 6rem;
-  padding: 2rem 0;
+  padding: 4rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
 }
 
 .techstack-header {
   text-align: center;
-  margin-bottom: 4rem;
+  margin-bottom: 3rem;
 }
 
 .techstack-title {
-  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  font-size: clamp(2rem, 5vw, 3.5rem);
   font-weight: 800;
-  background: linear-gradient(135deg, #f9fafb 0%, #14b8a6 50%, #22d3ee 100%);
+  color: #fff;
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+
+.techstack-title .gradient-text {
+  background: linear-gradient(135deg, #4ade80 0%, #3b82f6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: 1rem;
-  letter-spacing: -0.03em;
 }
 
 .techstack-subtitle {
   font-size: 1.1rem;
-  color: #d1d5db;
-  max-width: 36rem;
+  color: #94a3b8;
+  max-width: 600px;
   margin: 0 auto;
-  line-height: 1.7;
+  line-height: 1.6;
 }
 
-/* === SKILLS GRID === */
-.techstack-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 1.5rem;
+/* === FILTERS === */
+.tech-filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
   margin-bottom: 3rem;
+  padding: 0.5rem;
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 9999px;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  backdrop-filter: blur(12px);
 }
 
-@media (min-width: 768px) {
-  .techstack-grid {
-    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-    gap: 2rem;
-  }
-}
-
-/* === TECH CARD === */
-.tech-card {
+.filter-btn {
   position: relative;
-  background: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(2, 6, 23, 0.9));
-  border: 1px solid rgba(31, 41, 55, 0.6);
-  border-radius: 2rem;
-  padding: 2rem;
-  backdrop-filter: blur(16px);
-  overflow: hidden;
-  transition: all 0.3s ease;
-  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.8);
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  z-index: 1;
 }
 
-.tech-card::before {
-  content: '';
+.filter-btn:hover {
+  color: #fff;
+}
+
+.filter-btn.active {
+  color: #fff;
+}
+
+.filter-active-bg {
   position: absolute;
   top: 0;
-  left: -100%;
-  width: 100%;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 9999px;
+  z-index: -1;
+}
+
+/* === SKILLS GRID (SPOTLIGHT EFFECT) === */
+.techstack-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.tech-card {
+  background-color: rgba(15, 23, 42, 0.6);
+  border-radius: 24px;
+  padding: 1px; /* Border thickness */
+  position: relative;
+  cursor: default;
+  transition: transform 0.3s ease;
+  overflow: hidden;
+}
+
+/* This ::before is for the border highlight */
+.tech-card::before {
+  background: radial-gradient(
+    800px circle at var(--mouse-x, -9999px) var(--mouse-y, -9999px),
+    rgba(255, 255, 255, 0.2),
+    transparent 40%
+  );
+  border-radius: inherit;
+  content: "";
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-  transition: left 0.6s ease;
+  left: 0;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  transition: opacity 500ms;
+  width: 100%;
+  z-index: 1;
 }
 
-.tech-card:hover::before {
-  left: 100%;
+/* Ensure the border shines even when hovering a sibling card */
+.techstack-grid:hover > .tech-card::before {
+  opacity: 1;
 }
 
-.tech-card:hover {
-  transform: translateY(-10px);
-  border-color: rgba(20, 184, 166, 0.8);
-  box-shadow: 0 30px 60px rgba(20, 184, 166, 0.2);
-}
-
-/* === HEADER === */
-.tech-header {
+.tech-card-inner {
+  background-color: rgba(30, 41, 59, 0.85); /* Inner background made lighter */
+  border-radius: 23px;
+  padding: 1.75rem; /* Increased padding slightly for breathing room */
+  height: 100%;
   display: flex;
   align-items: center;
-  gap: 1.25rem;
-  margin-bottom: 1.5rem;
+  gap: 1.5rem; /* Increased gap */
+  position: relative;
+  z-index: 2;
 }
 
-.tech-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 1.5rem;
-  background: linear-gradient(135deg, rgba(var(--icon-color), 0.2), rgba(var(--icon-color), 0.1));
-  border: 2px solid rgba(var(--icon-color), 0.3);
+/* This ::before inside inner is for the inner glow */
+.tech-card-inner::before {
+  background: radial-gradient(
+    800px circle at var(--mouse-x, -9999px) var(--mouse-y, -9999px),
+    rgba(255, 255, 255, 0.04),
+    transparent 40%
+  );
+  border-radius: inherit;
+  content: "";
+  height: 100%;
+  left: 0;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  transition: opacity 500ms;
+  width: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.techstack-grid:hover .tech-card-inner::before {
+  opacity: 1;
+}
+
+/* === CARD CONTENT === */
+.tech-icon-wrapper {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: rgba(var(--icon-color-rgb), 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 12px 30px rgba(var(--icon-color), 0.2);
+  border: 1px solid rgba(var(--icon-color-rgb), 0.2);
+  color: rgb(var(--icon-color-rgb));
+  position: relative;
+}
+
+.tech-icon-wrapper.is-3d {
+  width: 80px;
+  height: 80px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  /* The 3D canvas draws its own wireframe glow, so we strip the CSS box here */
+}
+
+/* Ensure the Canvas spans the entire 80x80 box */
+.tech-icon-wrapper.is-3d > div {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.tech-info {
+  flex-grow: 1;
 }
 
 .tech-name {
   font-size: 1.3rem;
-  font-weight: 700;
-  color: #f9fafb;
-  margin: 0;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 0.35rem 0;
+  letter-spacing: 0.02em;
 }
 
-/* === PROGRESS BAR === */
-.tech-level-bar {
-  height: 8px;
-  width: 100%;
-  background: rgba(55, 65, 81, 0.6);
-  border-radius: 4px;
-  overflow: hidden;
-  margin: 0.75rem 0;
-  position: relative;
-}
-
-.tech-level-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--fill-color), rgba(var(--fill-color), 0.8));
-  border-radius: 4px;
-  position: relative;
-}
-
-.tech-level-fill::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 4px;
-  background: rgba(255, 255, 255, 0.4);
-  border-radius: 2px;
-}
-
-.tech-level-text {
+.tech-category {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #14b8a6;
-  position: absolute;
-  right: 0;
-  top: -2.5rem;
-}
-
-/* === CATEGORY BADGES === */
-.tech-categories {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-}
-
-.cat-backend {
-  background: linear-gradient(135deg, #f97316, #fb923c);
-  color: white;
-}
-
-.cat-ai {
-  background: linear-gradient(135deg, #ef4444, #f87171);
-  color: white;
-}
-
-.cat-frontend {
-  background: linear-gradient(135deg, #3b82f6, #60a5fa);
-  color: white;
-}
-
-.cat-database {
-  background: linear-gradient(135deg, #0ea5e9, #28c4ea);
-  color: white;
-}
-
-.cat-tools {
-  background: linear-gradient(135deg, #10b981, #34d399);
-  color: white;
-}
-
-.tech-categories span {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  border-radius: 1rem;
-  font-size: 0.7rem;
-  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
+  color: #94a3b8; /* Switched to a legible solid color instead of relying on the icon rgb alpha */
 }
 
 /* === SUMMARY STATS === */
@@ -191,12 +220,12 @@
   justify-content: center;
   align-items: center;
   gap: 4rem;
-  padding: 2rem;
-  background: linear-gradient(145deg, rgba(15, 23, 42, 0.6), rgba(2, 6, 23, 0.5));
-  border-radius: 2rem;
-  border: 1px solid rgba(20, 184, 166, 0.3);
+  padding: 2.5rem;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 32px;
   backdrop-filter: blur(12px);
-  margin-top: 2rem;
+  margin-top: 4rem;
 }
 
 .summary-item {
@@ -204,32 +233,35 @@
 }
 
 .summary-number {
-  font-size: 2.5rem;
+  font-size: 3rem;
   font-weight: 900;
-  background: linear-gradient(135deg, #14b8a6, #22d3ee);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #fff;
   line-height: 1;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
 }
 
 .summary-label {
-  font-size: 0.85rem;
-  color: #9ca3af;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-size: 0.9rem;
+  color: #94a3b8;
+  font-weight: 500;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
+  .tech-filters {
+    flex-wrap: wrap;
+    border-radius: 24px;
+  }
+  .filter-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
   .techstack-grid {
     grid-template-columns: 1fr;
-    gap: 1.25rem;
   }
-  
   .tech-summary {
     flex-direction: column;
     gap: 2rem;
+    padding: 2rem;
   }
 }
