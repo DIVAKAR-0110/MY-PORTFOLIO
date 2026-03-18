@@ -105,7 +105,8 @@ function Contact() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Network response was not ok');
+        console.error("Backend Error Response:", data);
+        throw new Error(data.details || data.error || 'Network response was not ok');
       }
 
       setStatus("success");
@@ -114,9 +115,9 @@ function Contact() {
       // Auto-reset after success
       setTimeout(() => setStatus("idle"), 8000);
     } catch (err) {
-      console.error(err);
+      console.error("Detailed Frontend Catch Error:", err);
       setStatus("error");
-      setErrorMSG("System Failure: Unable to route transmission.");
+      setErrorMSG(`System Failure: ${err.message || 'Unable to route transmission.'}`);
     }
   };
 

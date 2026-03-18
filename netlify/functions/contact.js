@@ -19,8 +19,18 @@ export const handler = async (event, context) => {
       };
     }
 
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+      console.error("Missing Environment Variables on Netlify Dashboard!");
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: "Server Configuration Error: Missing Credentials" }),
+      };
+    }
+
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
       auth: {
         user: process.env.GMAIL_USER,
         pass: process.env.GMAIL_APP_PASSWORD,
@@ -65,7 +75,7 @@ export const handler = async (event, context) => {
     console.error("Error sending email:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Failed to send message." }),
+      body: JSON.stringify({ error: "Failed to send", details: error.message }),
     };
   }
 };
