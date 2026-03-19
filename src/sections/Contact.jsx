@@ -110,8 +110,12 @@ function Contact() {
       } catch (e) {
         console.error("Non-JSON Response received:", responseText);
         let errorMsg = `Invalid server response (Status: ${response.status}).`;
-        if (response.status === 500 || response.status === 504) {
-          errorMsg = "Local server is unreachable or crashed. Please ensure 'npm run dev' started both frontend and backend.";
+        if (response.status === 500 || response.status === 504 || response.status === 404) {
+          if (window.location.hostname === "localhost") {
+            errorMsg = "Local server is unreachable. Please ensure 'npm run dev' started both frontend and backend.";
+          } else {
+            errorMsg = "Netlify Function error. Check your Netlify Dashboard Environment Variables (GMAIL_USER & GMAIL_APP_PASSWORD).";
+          }
         }
         throw new Error(errorMsg);
       }
