@@ -13,7 +13,7 @@ import {
 } from "react-icons/fi";
 import { useState, useEffect } from "react";
 
-const DISPLAY_EMAIL = "rdivakar0110" + "@" + "gmail.com";
+const DISPLAY_EMAIL = atob("cmRpdmFrYXIwMTEwQGdtYWlsLmNvbQ==");
 
 function Contact() {
 

@@ -10,7 +10,7 @@ import {
   FiChevronUp,
 } from "react-icons/fi";
 
-const DISPLAY_EMAIL = "rdivakar0110" + "@" + "gmail.com";
+const DISPLAY_EMAIL = atob("cmRpdmFrYXIwMTEwQGdtYWlsLmNvbQ==");
 
 function Footer() {
   const quickLinks = [
