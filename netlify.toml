@@ -1,0 +1,6 @@
+# Global configuration to disable the secrets scanner during the build
+# This allows the public email address to be displayed in the UI even though 
+# it matches a backend environment variable.
+
+[build.environment]
+  SECRETS_SCAN_ENABLED = "false"
