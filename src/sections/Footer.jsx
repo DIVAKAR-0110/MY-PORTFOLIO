@@ -10,6 +10,8 @@ import {
   FiChevronUp,
 } from "react-icons/fi";
 
+const DISPLAY_EMAIL = "rdivakar0110" + "@" + "gmail.com";
+
 function Footer() {
   const quickLinks = [
     { label: "Home", href: "#hero" },
@@ -66,10 +68,10 @@ function Footer() {
               <h4 className="footer-section-title">Get in touch</h4>
               <div className="footer-contact-items">
                 <a
-                  href="mailto:rdivakar0110@gmail.com"
+                  href={`mailto:${DISPLAY_EMAIL}`}
                   className="footer-contact-item"
                 >
-                  <FiMail /> rdivakar0110@gmail.com
+                  <FiMail /> {DISPLAY_EMAIL}
                 </a>
                 <a href="tel:+919876543210" className="footer-contact-item">
                   <FiMail /> +91 80151 65547

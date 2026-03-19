@@ -13,6 +13,8 @@ import {
 } from "react-icons/fi";
 import { useState, useEffect } from "react";
 
+const DISPLAY_EMAIL = "rdivakar0110" + "@" + "gmail.com";
+
 function Contact() {
 
   const [formData, setFormData] = useState({
@@ -37,7 +39,7 @@ function Contact() {
     } else if (status === "success") {
       messageToType = "Transmission successful! \nDivakar's Neural Net has received your message. \nExpect a response shortly.";
     } else if (status === "error") {
-      messageToType = "CRITICAL ERROR: Uplink failed. \nPlease bypass frontend protocols and email directly via rdivakar0110@gmail.com.";
+      messageToType = `CRITICAL ERROR: Uplink failed. \nPlease bypass frontend protocols and email directly via ${DISPLAY_EMAIL}.`;
     }
 
     setAiText(messageToType);
@@ -196,7 +198,7 @@ function Contact() {
             <h4 style={{ color: '#e5e7eb', marginBottom: '0.2rem', fontSize: '1.2rem' }}>Direct Links</h4>
             <div className="contact-direct-item">
               <div className="contact-icon-box"><FiMail size={20} /></div>
-              <span>rdivakar0110@gmail.com</span>
+              <span>{DISPLAY_EMAIL}</span>
             </div>
 
             <div className="contact-socials-advanced">
