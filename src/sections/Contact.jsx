@@ -131,9 +131,10 @@ function Contact() {
       // Auto-reset after success
       setTimeout(() => setStatus("idle"), 8000);
     } catch (err) {
-      console.error("Detailed Frontend Catch Error:", err);
+      console.error("CRITICAL CONTACT ERROR:", err);
       setStatus("error");
-      setErrorMSG(`System Failure: ${err.message || 'Unable to route transmission.'}`);
+      const finalMsg = err.message || "Uplink failure. Please try again later.";
+      setErrorMSG(`System Failure: ${finalMsg}`);
     }
   };
 
