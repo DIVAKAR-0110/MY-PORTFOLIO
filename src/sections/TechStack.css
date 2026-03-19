@@ -88,8 +88,8 @@
 /* === SKILLS GRID (SPOTLIGHT EFFECT) === */
 .techstack-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); /* Slightly narrower for mobile */
+  gap: 1.25rem;
   position: relative;
   z-index: 1;
 }
@@ -248,20 +248,51 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  .techstack-section {
+    padding: 3rem 1.25rem;
+  }
   .tech-filters {
-    flex-wrap: wrap;
-    border-radius: 24px;
+    gap: 0.35rem;
+    padding: 0.35rem;
+    border-radius: 20px;
+    width: 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tech-filters::-webkit-scrollbar {
+    display: none;
   }
   .filter-btn {
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 1.2rem;
     font-size: 0.85rem;
+    white-space: nowrap;
   }
   .techstack-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
+  .tech-card-inner {
+    padding: 1.25rem;
+    gap: 1rem;
+  }
+  .tech-summary {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 2rem;
+    padding: 2rem 1rem;
+    justify-content: space-around;
+  }
+}
+
+@media (max-width: 480px) {
   .tech-summary {
     flex-direction: column;
     gap: 2rem;
-    padding: 2rem;
+    align-items: center;
+  }
+  .summary-number {
+    font-size: 2.5rem;
   }
 }

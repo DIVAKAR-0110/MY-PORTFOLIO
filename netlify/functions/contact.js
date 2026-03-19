@@ -10,12 +10,29 @@ export const handler = async (event, context) => {
   }
 
   try {
-    const { name, email, message } = JSON.parse(event.body);
+    if (!event.body) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Invalid request: Missing body." }),
+      };
+    }
+
+    let body;
+    try {
+      body = JSON.parse(event.body);
+    } catch (e) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Invalid request: Body is not valid JSON." }),
+      };
+    }
+
+    const { name, email, message } = body;
 
     if (!name || !email || !message) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "All fields are required." }),
+        body: JSON.stringify({ error: "All fields are required (name, email, message)." }),
       };
     }
 

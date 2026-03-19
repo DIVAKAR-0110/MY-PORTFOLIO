@@ -141,33 +141,56 @@
 
 /* === MOBILE DROPDOWN === */
 .nav-mobile {
-  display: none;
-  background: rgba(2, 6, 23, 0.97);
-  border-top: 1px solid #1f2937;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(2, 6, 23, 0.98);
+  border-bottom: 1px solid #1f2937;
+  backdrop-filter: blur(20px);
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+  visibility: hidden;
+  z-index: -1;
 }
 
 .nav-mobile.open {
-  display: block;
+  max-height: 400px;
+  opacity: 1;
+  visibility: visible;
+  padding-bottom: 1.5rem;
 }
 
 .nav-mobile-inner {
-  padding: 0.75rem 0 0.85rem;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .nav-mobile-btn {
   width: 100%;
   border: none;
-  background: none;
-  padding: 0.45rem 0;
+  background: transparent;
+  padding: 0.8rem 0;
   text-align: left;
-  font-size: 0.9rem;
+  font-size: 1rem;
+  font-weight: 500;
   color: #e5e7eb;
   cursor: pointer;
-  transition: color 0.15s ease;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.nav-mobile-btn:last-child {
+  border-bottom: none;
 }
 
 .nav-mobile-btn:hover {
   color: #14b8a6;
+  padding-left: 0.5rem;
 }
 
 /* === UTIL: container (if not already defined globally) === */

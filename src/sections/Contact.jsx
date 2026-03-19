@@ -102,7 +102,19 @@ function Contact() {
         }),
       });
 
-      const data = await response.json();
+      let data;
+      const responseText = await response.text();
+      
+      try {
+        data = JSON.parse(responseText);
+      } catch (e) {
+        console.error("Non-JSON Response received:", responseText);
+        let errorMsg = `Invalid server response (Status: ${response.status}).`;
+        if (response.status === 500 || response.status === 504) {
+          errorMsg = "Local server is unreachable or crashed. Please ensure 'npm run dev' started both frontend and backend.";
+        }
+        throw new Error(errorMsg);
+      }
 
       if (!response.ok) {
         console.error("Backend Error Response:", data);

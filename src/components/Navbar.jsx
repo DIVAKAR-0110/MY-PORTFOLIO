@@ -2,6 +2,7 @@
 import "./Navbar.css";
 import { useState } from "react";
 import { FiGithub, FiLinkedin, FiMenu, FiX } from "react-icons/fi";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const navLinks = [
   { id: "hero", label: "Home" },
@@ -14,8 +15,15 @@ const navLinks = [
 
 function Navbar() {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleScroll = (id) => {
+    if (location.pathname !== "/") {
+      navigate(`/#${id}`);
+      setOpen(false);
+      return;
+    }
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
     setOpen(false);
@@ -54,7 +62,7 @@ function Navbar() {
               <FiGithub size={18} />
             </a>
             <a
-              href="https://www.linkedin.com"
+              href="https://www.linkedin.com/in/r-divakar-482212303/"
               target="_blank"
               rel="noreferrer"
               className="nav-icon-link"

@@ -2,7 +2,7 @@
 import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Canvas } from "@react-three/fiber";
-import { Float, Html } from "@react-three/drei";
+import { Float, Html, View, Preload } from "@react-three/drei";
 import "./TechStack.css";
 import {
   SiReact,
@@ -51,21 +51,20 @@ const skills = [
 const categories = ["All", "Frontend", "Backend", "AI", "Database", "Tools"];
 
 // --- 3D INTERACTIVE ICON COMPONENT ---
-// Replaces the flat CSS icon wrapper with a literal floating 3D geometry in a mini-canvas
+// Uses View from @react-three/drei to "portal" 3D content into a single global Canvas
 function ThreeDIcon({ icon: Icon, colorRgb }) {
+  const ref = useRef();
   const hexColor = `rgb(${colorRgb})`;
+  
   return (
-    <div className="tech-icon-wrapper is-3d">
-      <Canvas camera={{ position: [0, 0, 4.5], fov: 45 }}>
+    <div ref={ref} className="tech-icon-wrapper is-3d">
+      <View track={ref}>
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1} />
-        {/* Float makes the 3D object dynamically bob and spin like it's in zero-G */}
         <Float speed={2.5} rotationIntensity={1.5} floatIntensity={2}>
           <mesh>
-            {/* The wireframe shell housing the icon */}
             <octahedronGeometry args={[1.5, 0]} />
             <meshStandardMaterial color={hexColor} wireframe={true} emissive={hexColor} emissiveIntensity={0.5} />
-            {/* The actual HTML SVG icon suspended in the center of the 3D space */}
             <Html center transform distanceFactor={9}>
               <div style={{ color: hexColor, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <Icon size={50} />
@@ -73,7 +72,7 @@ function ThreeDIcon({ icon: Icon, colorRgb }) {
             </Html>
           </mesh>
         </Float>
-      </Canvas>
+      </View>
     </div>
   );
 }
@@ -113,6 +112,7 @@ const SpotlightCard = ({ children, colorRgb }) => {
 // --- MAIN TECHSTACK COMPONENT ---
 function TechStack() {
   const [activeFilter, setActiveFilter] = useState("All");
+  const sectionRef = useRef();
 
   const filteredSkills = skills.filter((skill) =>
     activeFilter === "All" ? true : skill.category === activeFilter
@@ -120,6 +120,7 @@ function TechStack() {
 
   return (
     <motion.section
+      ref={sectionRef}
       id="stack"
       className="techstack-section"
       initial={{ opacity: 0 }}
@@ -203,6 +204,22 @@ function TechStack() {
           <div className="summary-label">PROJECTS COMPLETED</div>
         </div>
       </motion.div>
+      {/* GLOBAL BACKGROUND CANVAS - Shared context for all View components */}
+      <Canvas
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          pointerEvents: "none",
+          zIndex: 1
+        }}
+        eventSource={sectionRef}
+      >
+        <View.Port />
+        <Preload all />
+      </Canvas>
     </motion.section>
   );
 }

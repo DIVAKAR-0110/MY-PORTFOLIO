@@ -17,6 +17,20 @@ import ProjectDetail from "./sections/ProjectDetail";
 import "./App.css"; // Add loading styles here
 
 const MainLayout = () => {
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash) {
+      const id = hash.replace("#", "");
+      const el = document.getElementById(id);
+      if (el) {
+        // Small delay to ensure components are rendered
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 100);
+      }
+    }
+  }, []);
+
   return (
     <>
       <Navbar />

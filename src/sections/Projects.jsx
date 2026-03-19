@@ -22,10 +22,18 @@ export const projects = [
     subtitle: "Deep Learning · Computer Vision",
     description:
       "Real-time face recognition with TensorFlow CNN models, OpenCV streams, Django backend, and analytics dashboards.",
-    highlights: [
-      "95% accuracy on diverse datasets",
-      "500+ faces/minute processing",
-      "Role-based analytics dashboards",
+    fullDescription: "A sophisticated end-to-end platform for real-time face identification and analytics. This system integrates deep learning models with a robust web backend to provide instant identification and historical tracking. Designed for high-concurrency environments, it handles multiple video streams simultaneously while maintaining sub-second latency.",
+    challenges: [
+      "Optimizing CNN models for real-time performance on commodity hardware.",
+      "Handling lighting variations and occlusions in live video streams.",
+      "Scaling the Django backend to manage high-frequency data from multiple edge devices."
+    ],
+    solution: "Implemented MTCNN for face detection and FaceNet for embeddings. Used Redis for caching and Celery for asynchronous processing of intensive analytics tasks, reducing API response times by 40%.",
+    features: [
+      "Real-time identity verification",
+      "Crowd density estimation",
+      "Sentiment and demographic analysis",
+      "Automated attendance logging"
     ],
     stack: ["Python", "TensorFlow", "OpenCV", "Django", "PostgreSQL"],
     image: g3,
@@ -41,10 +49,18 @@ export const projects = [
     subtitle: "Enterprise · Full-Stack Retail",
     description:
       "Complete inventory, billing, supplier management with RBAC for textile operations.",
-    highlights: [
-      "5 user roles with full RBAC",
-      "Real-time inventory sync",
-      "70% faster billing process",
+    fullDescription: "A domain-specific Enterprise Resource Planning (ERP) system tailored for the textile retail industry. SSRetails automates complex inventory management, streamlines the billing process with barcode integration, and provides detailed financial reporting for informed business decision-making.",
+    challenges: [
+      "Managing complex inventory states with variable stock units common in textiles.",
+      "Implementing a secure, fine-grained Role-Based Access Control (RBAC) system.",
+      "Ensuring sub-second billing execution during peak hours."
+    ],
+    solution: "Architected a normalized PostgreSQL schema to handle diverse stock attributes and implemented a custom middleware for RBAC. Optimized SQL queries to ensure high performance during heavy transactional periods.",
+    features: [
+      "Barcode-integrated billing system",
+      "Supplier and vendor management portal",
+      "Automated low-stock alerts",
+      "Multi-user role auditing"
     ],
     stack: ["Django", "PostgreSQL", "Tailwind", "JavaScript"],
     image: g1,
@@ -60,10 +76,18 @@ export const projects = [
     subtitle: "SaaS · Civic Technology",
     description:
       "Citizen complaint lifecycle with admin dashboards, REST APIs, and automated workflows.",
-    highlights: [
-      "Full CRUD + status tracking",
-      "Multi-tenant ready architecture",
-      "PDF reports & audit trails",
+    fullDescription: "A transparent and efficient platform for citizens to report grievances and for government officials to track and resolve them. This GovTech solution bridges the gap between public administration and citizens, fostering accountability and rapid response through automated status updates and audit trails.",
+    challenges: [
+      "Ensuring data privacy and security for citizen reports.",
+      "Creating a flexible workflow engine for multi-stage complaint resolution.",
+      "Providing real-time notifications to users across different channels."
+    ],
+    solution: "Utilized Django Rest Framework for secure API endpoints and custom signals for internal workflow transitions. Implemented multi-tenant data isolation to support different administrative zones.",
+    features: [
+      "Interactive citizen dashboard",
+      "Admin workflow management",
+      "Automated SMS/Email status updates",
+      "PDF reporting for auditing"
     ],
     stack: ["Django", "MySQL", "REST APIs", "Bootstrap"],
     image: g2,
@@ -79,10 +103,18 @@ export const projects = [
     subtitle: "Microservices · Zero-Trust Security",
     description:
       "Production JWT auth system with Spring Security, policy engine, and role-based permissions.",
-    highlights: [
-      "OAuth2 + JWT hybrid auth",
-      "Policy-based access control",
-      "99.9% uptime guarantee",
+    fullDescription: "A highly secure authentication and authorization service designed for enterprise-level microservices. Implementing Zero-Trust principles, this platform provides centralized identity management, delegated access, and continuous monitoring of permission states across internal systems.",
+    challenges: [
+      "Implementing a secure OAuth2 flows with JWT statelessness.",
+      "Managing token revocation and blacklisting in a distributed system.",
+      "Integrating with diverse microservice architectures with minimal latency."
+    ],
+    solution: "Leveraged Spring Security for the core auth logic and Redis for managing revoked token blacklists. Used a high-availability MySQL cluster for persistent identity storage.",
+    features: [
+      "JWT-based stateless authentication",
+      "Granular permission policy engine",
+      "OAuth2/OIDC integration",
+      "Security audit logging"
     ],
     stack: ["Spring Boot", "Spring Security", "JWT", "MySQL"],
     image: g4,
@@ -288,12 +320,9 @@ function Projects() {
                       {/* MAIN CONTENT GRID */}
                       <div className="app-modal-grid">
                         <div className="app-modal-main">
-                          <h3>Overview</h3>
-                          <p className="app-desc-large">{project.description}</p>
-
-                          <h3>Key Architectural Highlights</h3>
+                          <h3>Detailed Features</h3>
                           <ul className="app-highlights-list">
-                            {project.highlights.map((h, i) => (
+                            {project.features?.map((h, i) => (
                               <motion.li
                                 key={i}
                                 initial={{ opacity: 0, x: -20 }}
@@ -305,6 +334,27 @@ function Projects() {
                               </motion.li>
                             ))}
                           </ul>
+
+                          {project.challenges && (
+                            <>
+                              <h3>Technical Challenges</h3>
+                              <ul className="app-highlights-list">
+                                {project.challenges.map((c, i) => (
+                                  <motion.li key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 + i * 0.1 }}>
+                                    <span className="highlight-bullet" style={{ background: "#ef4444" }} />
+                                    {c}
+                                  </motion.li>
+                                ))}
+                              </ul>
+                            </>
+                          )}
+
+                          {project.solution && (
+                            <>
+                              <h3>The Solution</h3>
+                              <p className="app-desc-large">{project.solution}</p>
+                            </>
+                          )}
                         </div>
 
                         <div className="app-modal-sidebar">
@@ -321,7 +371,7 @@ function Projects() {
 
                           <div className="app-sidebar-actions">
                             <motion.a
-                              href={project.github || "#"}
+                              href={"https://github.com/DIVAKAR-0110" || "#"}
                               target="_blank"
                               rel="noreferrer"
                               className="app-action-btn secondary"
