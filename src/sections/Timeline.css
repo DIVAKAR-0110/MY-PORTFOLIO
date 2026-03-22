@@ -1,185 +1,138 @@
-/* === TIMELINE SECTION (COMPACT) === */
+/* Timeline.css */
 .timeline-section {
-  padding: 2.5rem 0;
-  margin: 2rem 0;
-  background: transparent;
-}
-
-/* === HEADER (SMALLER) === */
-.timeline-header {
-  text-align: center;
-  margin-bottom: 2.5rem;
-}
-
-.timeline-title {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #f1f5f9;
-  margin-bottom: 0.5rem;
-}
-
-.timeline-subtitle {
-  font-size: 0.95rem;
-  color: #94a3b8;
-  max-width: 500px;
-  margin: 0 auto 1rem;
-  line-height: 1.5;
-}
-
-.header-stats {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.header-stats span {
-  padding: 0.3rem 0.8rem;
-  background: rgba(20, 184, 166, 0.15);
-  border-radius: 999px;
-  font-size: 0.75rem;
-  color: #5eead4;
-}
-
-/* === CONTAINER WITH LEFT BORDER === */
-.timeline-container {
-  max-width: 800px;
-  margin: auto;
-  padding-left: 1.5rem;
-  border-left: 2px solid rgba(148, 163, 184, 0.3);
+  padding: 4rem 1.5rem 2rem;
   position: relative;
 }
 
-/* === ENTRY (COMPACT ROW) === */
-.timeline-entry {
-  position: relative;
-  margin-bottom: 2rem;
-  padding-left: 1.5rem;
+.timeline-journey {
   display: flex;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 3rem;
+  max-width: 850px;
+  margin: 0 auto;
+  position: relative;
+  padding-left: 2.5rem;
 }
 
-/* === DOT INDICATOR === */
-.timeline-entry::before {
+/* Central spine */
+.timeline-journey::before {
   content: "";
   position: absolute;
-  left: -9px;
-  top: 6px;
-  width: 12px;
-  height: 12px;
+  left: 1rem; top: 0; bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, transparent, var(--accent), var(--accent-dark), transparent);
+  opacity: 0.4;
+}
+
+.timeline-manuscript {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+}
+
+.manuscript-indicator {
+  position: absolute;
+  left: -2.5rem;
+  top: 0.5rem;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: var(--timeline-color);
-  box-shadow: 0 0 10px var(--timeline-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  z-index: 5;
+  border: 2px solid #F9EDD5;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
-/* === SMALL LOGO === */
-.entry-logo {
-  width: 45px;
-  height: 45px;
-  border-radius: 0.75rem;
-  overflow: hidden;
-  flex-shrink: 0;
+.manuscript-card {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  flex: 1;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
 }
 
-.entry-logo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.manuscript-card:hover {
+  border-color: var(--border-accent);
+  box-shadow: var(--shadow-md);
+  transform: translateX(8px);
 }
 
-/* === CARD === */
-.timeline-card {
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(71, 85, 105, 0.3);
-  border-radius: 1rem;
-  padding: 1rem 1.2rem;
-  width: 100%;
-  transition: all 0.25s ease;
-}
-
-.timeline-card:hover {
-  background: rgba(15, 23, 42, 0.9);
-  transform: translateX(4px);
-  border-color: var(--timeline-color);
-}
-
-/* === HEADER ROW === */
-.card-header {
+.manuscript-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.8rem;
 }
 
-.year-badge {
+.manuscript-year {
+  font-family: 'Cinzel', serif;
   font-size: 0.75rem;
-  font-weight: 600;
-  color: #94a3b8;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.1em;
 }
 
-.entry-icon {
-  font-size: 1rem;
+.manuscript-logo {
+  height: 32px;
+  width: 32px;
+  object-fit: contain;
+  filter: grayscale(1) contrast(1.2);
+  opacity: 0.6;
 }
 
-/* === TEXT === */
-.entry-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #f8fafc;
-  margin-bottom: 0.25rem;
+.manuscript-title {
+  font-family: 'Cinzel', serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.2rem;
 }
 
-.entry-institution {
-  font-size: 0.85rem;
-  color: #5eead4;
-  margin-bottom: 0.5rem;
-}
-
-.entry-description {
-  font-size: 0.8rem;
-  color: #cbd5e1;
-  line-height: 1.4;
-  margin-bottom: 0.6rem;
-}
-
-/* === ACHIEVEMENTS SMALL BADGE === */
-.achievement-main {
-  font-size: 0.75rem;
-  padding: 0.3rem 0.6rem;
-  background: rgba(20, 184, 166, 0.15);
-  border-radius: 999px;
-  display: inline-block;
-  margin-bottom: 0.5rem;
-}
-
-/* === SKILLS (COMPACT TAGS) === */
-.skills-tags {
+.manuscript-institution {
+  font-family: 'IM Fell English', serif;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-bottom: 0.75rem;
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.skill-tag {
-  font-size: 0.7rem;
-  padding: 0.25rem 0.6rem;
-  border-radius: 999px;
-  background: rgba(148, 163, 184, 0.15);
-  color: #e2e8f0;
+.manuscript-cert {
+  text-decoration: none;
+  font-size: 1rem;
+  transition: transform 0.2s;
 }
 
-/* REMOVE BIG PROGRESS BAR */
-.timeline-progress {
-  display: none;
+.manuscript-cert:hover { transform: scale(1.3); }
+
+.manuscript-achieve {
+  font-family: 'Cinzel', serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--accent-dark);
+  border: 1px solid var(--border-accent);
+  display: inline-block;
+  padding: 0.2rem 0.75rem;
+  border-radius: 2px;
+  margin-bottom: 0.8rem;
+  background: var(--bg-secondary);
 }
 
-/* MOBILE */
-@media (max-width: 768px) {
-  .timeline-container {
-    padding-left: 1rem;
-  }
+.manuscript-desc {
+  font-family: 'IM Fell English', serif;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
 
-  .timeline-entry {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
+@media (max-width: 600px) {
+  .timeline-journey { padding-left: 1.5rem; }
+  .manuscript-indicator { left: -1.75rem; width: 30px; height: 30px; font-size: 0.85rem; }
 }

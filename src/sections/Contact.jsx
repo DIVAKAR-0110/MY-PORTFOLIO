@@ -1,60 +1,29 @@
 // src/sections/Contact.jsx
 import "./Contact.css";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  FiGithub,
-  FiLinkedin,
-  FiMail,
-  FiSend,
-  FiCheckCircle,
-  FiAlertCircle,
-  FiTerminal,
-  FiCpu
-} from "react-icons/fi";
+import { FiGithub, FiLinkedin, FiMail, FiSend, FiCheckCircle, FiAlertCircle, FiFeather, FiBookOpen } from "react-icons/fi";
 import { useState, useEffect } from "react";
 
 const DISPLAY_EMAIL = atob("cmRpdmFrYXIwMTEwQGdtYWlsLmNvbQ==");
 
 function Contact() {
-
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: "",
-  });
-
+  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [status, setStatus] = useState("idle"); // idle | sending | success | error
   const [errorMSG, setErrorMSG] = useState("");
-  const [aiText, setAiText] = useState("");
   const [typedText, setTypedText] = useState("");
 
-
-  // AI Typing Effect Logic
   useEffect(() => {
-    let messageToType = "";
-    if (status === "idle") {
-      messageToType = "Connecting to Divakar's grid... \nIdentity verified. \nReady to receive your transmission.";
-    } else if (status === "sending") {
-      messageToType = "Encrypting data... \nEstablishing secure uplink to core servers... \nDeploying payload...";
-    } else if (status === "success") {
-      messageToType = "Transmission successful! \nDivakar's Neural Net has received your message. \nExpect a response shortly.";
-    } else if (status === "error") {
-      messageToType = `CRITICAL ERROR: Uplink failed. \nPlease bypass frontend protocols and email directly via ${DISPLAY_EMAIL}.`;
-    }
+    let msg = "";
+    if (status === "idle") msg = "Awakening the Labyrinth... \nCipher verified. \nReady to scribe your dispatch.";
+    else if (status === "sending") msg = "Sealing the scroll... \nDispatching messenger birds to the Citadel... \nCross-referencing historical archives...";
+    else if (status === "success") msg = "Dispatch received! \nDivakar's Chronicles have been updated. \nExpect a reply through the carrier network.";
+    else if (status === "error") msg = `FALLBACK PROTOCOL: Carrier lost. \nDirect your scroll via ${DISPLAY_EMAIL}.`;
 
-    setAiText(messageToType);
-    setTypedText("");
-
-    let currentIndex = 0;
+    let i = 0;
     const interval = setInterval(() => {
-      if (currentIndex <= messageToType.length) {
-        setTypedText(messageToType.slice(0, currentIndex));
-        currentIndex++;
-      } else {
-        clearInterval(interval);
-      }
-    }, 40); // Type speed
-
+      if (i <= msg.length) { setTypedText(msg.slice(0, i)); i++; }
+      else clearInterval(interval);
+    }, 35);
     return () => clearInterval(interval);
   }, [status]);
 
@@ -63,251 +32,109 @@ function Contact() {
     if (errorMSG) setErrorMSG("");
   };
 
-  const validateForm = () => {
-    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
-      setErrorMSG("Error: All mission-critical fields must be filled.");
-      return false;
-    }
-    
-    // Basic email regex validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email.trim())) {
-      setErrorMSG("Error: Invalid return address format.");
-      return false;
-    }
-
-    return true;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      setStatus("error");
+    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
+      setErrorMSG("Alas! Every parchment field must be inscribed.");
       return;
     }
-
     setStatus("sending");
-
     try {
-      // In production (Netlify), this hits the serverless function seamlessly.
-      // In local dev, it requires `netlify dev` to run, but we can hit it easily.
-      const response = await fetch("/.netlify/functions/contact", {
+      const resp = await fetch("/.netlify/functions/contact", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          message: formData.message,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
       });
-
-      let data;
-      const responseText = await response.text();
-      
-      try {
-        data = JSON.parse(responseText);
-      } catch (e) {
-        console.error("Non-JSON Response received:", responseText);
-        let errorMsg = `Invalid server response (Status: ${response.status}).`;
-        if (response.status === 500 || response.status === 504 || response.status === 404) {
-          if (window.location.hostname === "localhost") {
-            errorMsg = "Local server is unreachable. Please ensure 'npm run dev' started both frontend and backend.";
-          } else {
-            errorMsg = "Netlify Function error. Check your Netlify Dashboard Environment Variables (GMAIL_USER & GMAIL_APP_PASSWORD).";
-          }
-        }
-        throw new Error(errorMsg);
-      }
-
-      if (!response.ok) {
-        console.error("Backend Error Response:", data);
-        throw new Error(data.details || data.error || 'Network response was not ok');
-      }
-
+      if (!resp.ok) throw new Error("The scroll was rejected by the oracle.");
       setStatus("success");
       setFormData({ name: "", email: "", message: "" });
-      
-      // Auto-reset after success
-      setTimeout(() => setStatus("idle"), 8000);
     } catch (err) {
-      console.error("CRITICAL CONTACT ERROR:", err);
+      setErrorMSG(err.message);
       setStatus("error");
-      const finalMsg = err.message || "Uplink failure. Please try again later.";
-      setErrorMSG(`System Failure: ${finalMsg}`);
     }
   };
-
-  // Framer Motion Variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.15, delayChildren: 0.2 }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
-  };
-
-
 
   return (
     <section id="contact" className="contact">
-      <div className="contact-container">
+      <div className="section-eyebrow">Dispatch a Scroll</div>
+      <h2 className="section-title">Envoys & Messages</h2>
+      <div className="section-ornament" />
 
-        {/* LEFT SIDE: AI ASSISTANT */}
+      <div className="contact-grid">
+        {/* Left: Mystical Terminal */}
         <motion.div
-          className="ai-assistant-wrapper"
-          initial={{ opacity: 0, x: -50 }}
+          className="contact-lore-box"
+          initial={{ opacity: 0, x: -40 }}
           whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.8, type: "spring" }}
+          viewport={{ once: true }}
         >
-          <div className="ai-orb-container">
-            <div className="ai-orb" />
-            <div className="ai-status">
-              <FiCpu /> {status === 'sending' ? 'PROCESSING' : status === 'success' ? 'ONLINE' : status === 'error' ? 'FAULT' : 'ACTIVE'}
+          <div className="lore-orb-header">
+            <div className="lore-orb" style={{ borderColor: status === 'success' ? '#2E5820' : status === 'error' ? '#8B3A1E' : 'var(--accent)' }} />
+            <div className="lore-status">
+              <FiFeather /> {status.toUpperCase()}
             </div>
           </div>
 
-          <div className="terminal-window">
-            <div className="terminal-header">
-              <div className="terminal-dot r"></div>
-              <div className="terminal-dot y"></div>
-              <div className="terminal-dot g"></div>
+          <div className="mystic-scroll-box">
+            <div className="scroll-dots">
+              <span className="dot" /><span className="dot" /><span className="dot" />
             </div>
-            <div className="terminal-content">
-              <p>
-                {typedText.split('\n').map((line, i) => (
-                  <span key={i}>
-                    {line}
-                    <br />
-                  </span>
-                ))}
-                <span className="cursor-blink"></span>
-              </p>
+            <div className="scroll-content">
+              {typedText.split('\n').map((line, j) => <p key={j}>{line}</p>)}
+              <span className="quill-cursor"></span>
             </div>
           </div>
 
-          <div className="contact-direct-info">
-            <h4 style={{ color: '#e5e7eb', marginBottom: '0.2rem', fontSize: '1.2rem' }}>Direct Links</h4>
-            <div className="contact-direct-item">
-              <div className="contact-icon-box"><FiMail size={20} /></div>
-              <span>{DISPLAY_EMAIL}</span>
+          <div className="lore-links">
+            <h4 className="lore-h">The Direct Path</h4>
+            <div className="lore-email">
+              <FiMail className="lore-icon" /> <span>{DISPLAY_EMAIL}</span>
             </div>
-
-            <div className="contact-socials-advanced">
-              <a href="https://github.com/DIVAKAR-0110" target="_blank" rel="noreferrer" className="social-glass-btn" title="GitHub">
-                <FiGithub />
-              </a>
-              <a href="https://www.linkedin.com/in/r-divakar-482212303/" target="_blank" rel="noreferrer" className="social-glass-btn" title="LinkedIn">
-                <FiLinkedin />
-              </a>
+            <div className="lore-socials">
+              <a href="https://github.com/DIVAKAR-0110" target="_blank" rel="noreferrer"><FiGithub /></a>
+              <a href="https://www.linkedin.com/in/r-divakar-482212303/" target="_blank" rel="noreferrer"><FiLinkedin /></a>
             </div>
           </div>
         </motion.div>
 
-        {/* RIGHT SIDE: ADVANCED FORM */}
+        {/* Right: Scroll Form */}
         <motion.form
+          className="contact-manuscript-form"
           onSubmit={handleSubmit}
-          className="contact-form-advanced"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
+          initial={{ opacity: 0, x: 40 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
         >
-          <motion.div className="form-header" variants={itemVariants}>
-            <h3>Initialize Contact</h3>
-            <p>Send a message through the secure quantum channel.</p>
-          </motion.div>
+          <div className="form-legend">
+            <h3>Dispatch Your Scroll 📜</h3>
+            <p>Your message shall be carried to the inner vault.</p>
+          </div>
 
-          <motion.div className="input-group-advanced" variants={itemVariants}>
-            <input
-              type="text"
-              name="name"
-              placeholder=" "
-              value={formData.name}
-              onChange={handleChange}
-              disabled={status === "sending"}
-              className="advanced-input"
-            />
-            <label>Identification (Name)</label>
-            <div className="input-highlight"></div>
-          </motion.div>
+          <div className="scroll-field">
+            <input name="name" type="text" placeholder=" " value={formData.name} onChange={handleChange} disabled={status === "sending"} />
+            <label>The Envoy's Name</label>
+            <div className="line" />
+          </div>
 
-          <motion.div className="input-group-advanced" variants={itemVariants}>
-            <input
-              type="email"
-              name="email"
-              placeholder=" "
-              value={formData.email}
-              onChange={handleChange}
-              disabled={status === "sending"}
-              className="advanced-input"
-            />
-            <label>Return Address (Email)</label>
-            <div className="input-highlight"></div>
-          </motion.div>
+          <div className="scroll-field">
+            <input name="email" type="email" placeholder=" " value={formData.email} onChange={handleChange} disabled={status === "sending"} />
+            <label>Return Destination (Email)</label>
+            <div className="line" />
+          </div>
 
-          <motion.div className="input-group-advanced" variants={itemVariants}>
-            <textarea
-              name="message"
-              placeholder=" "
-              value={formData.message}
-              onChange={handleChange}
-              disabled={status === "sending"}
-              className="advanced-textarea"
-            />
-            <label>Transmission Payload (Message)</label>
-            <div className="input-highlight"></div>
-          </motion.div>
+          <div className="scroll-field">
+            <textarea name="message" placeholder=" " value={formData.message} onChange={handleChange} disabled={status === "sending"} />
+            <label>The Message Content</label>
+            <div className="line" />
+          </div>
 
-          <motion.button
-            type="submit"
-            className={`btn-submit-advanced ${status}`}
-            disabled={status === "sending"}
-            variants={itemVariants}
-          >
-            {status === "sending" && <FiCpu className="spin" size={20} />}
-            {status === "success" && <FiCheckCircle size={20} />}
-            {status === "error" && <FiAlertCircle size={20} />}
-
-            <span className="btn-text">
-              {status === "sending"
-                ? "TRANSMITTING..."
-                : status === "success"
-                  ? "TRANSMISSION SECURED"
-                  : "SEND TRANSMISSION"}
-            </span>
-            {status === "idle" && <FiSend className="btn-icon" />}
-          </motion.button>
+          <button type="submit" className="scroll-submit-btn" disabled={status === "sending"}>
+            {status === "sending" ? "DISPATCHING..." : status === "success" ? "RECEIVED" : "SEND DISPATCH"}
+            {status === "idle" && <FiSend />}
+          </button>
 
           <AnimatePresence>
-            {errorMSG && (
-              <motion.div
-                className={`contact-alert error`}
-                initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                animate={{ opacity: 1, height: 'auto', marginTop: '1rem' }}
-                exit={{ opacity: 0, height: 0, marginTop: 0 }}
-              >
-                <FiAlertCircle /> {errorMSG}
-              </motion.div>
-            )}
-            {status === 'success' && (
-              <motion.div
-                className={`contact-alert success`}
-                initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                animate={{ opacity: 1, height: 'auto', marginTop: '1rem' }}
-                exit={{ opacity: 0, height: 0, marginTop: 0 }}
-              >
-                <FiCheckCircle /> Transmission Successful!
-              </motion.div>
-            )}
+            {errorMSG && <motion.div className="scroll-alert error" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}><FiAlertCircle /> {errorMSG}</motion.div>}
           </AnimatePresence>
         </motion.form>
       </div>

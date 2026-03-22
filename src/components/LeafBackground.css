@@ -1,0 +1,76 @@
+/* LeafBackground.css */
+.leaf-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.leaf {
+  position: absolute;
+  top: -60px;
+  user-select: none;
+  animation: leafFall linear infinite;
+  opacity: 0.75;
+  will-change: transform, opacity;
+}
+
+@keyframes leafFall {
+  0% {
+    transform: translateY(-60px) rotate(0deg) translateX(0);
+    opacity: 0;
+  }
+  5% {
+    opacity: 0.85;
+  }
+  25% {
+    transform: translateY(25vh) rotate(90deg) translateX(30px);
+  }
+  50% {
+    transform: translateY(50vh) rotate(180deg) translateX(-25px);
+  }
+  75% {
+    transform: translateY(75vh) rotate(270deg) translateX(20px);
+    opacity: 0.75;
+  }
+  95% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(110vh) rotate(360deg) translateX(-10px);
+    opacity: 0;
+  }
+}
+
+/* Stagger odd leaves differently for more natural look */
+.leaf:nth-child(odd) {
+  animation-name: leafFallAlt;
+}
+
+@keyframes leafFallAlt {
+  0% {
+    transform: translateY(-60px) rotate(45deg) translateX(0);
+    opacity: 0;
+  }
+  5% {
+    opacity: 0.8;
+  }
+  25% {
+    transform: translateY(25vh) rotate(135deg) translateX(-35px);
+  }
+  50% {
+    transform: translateY(50vh) rotate(225deg) translateX(20px);
+  }
+  75% {
+    transform: translateY(75vh) rotate(315deg) translateX(-15px);
+    opacity: 0.65;
+  }
+  95% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(110vh) rotate(405deg) translateX(10px);
+    opacity: 0;
+  }
+}

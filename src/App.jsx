@@ -1,211 +1,149 @@
 // src/App.jsx
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { ThemeProvider } from "./context/ThemeContext";
+
 import Navbar from "./components/Navbar";
-import BackgroundOrbs from "./components/BackgroundOrbs";
+import LeafBackground from "./components/LeafBackground";
 import Hero from "./sections/Hero";
+import Stats from "./sections/Stats";
 import TechStack from "./sections/TechStack";
-import Projects, { projects } from "./sections/Projects";
-import ContentCreator from "./sections/ContentCreator";
-import About from "./sections/About";
+import Projects from "./sections/Projects";
+import Certifications from "./sections/Certifications";
 import Timeline from "./sections/Timeline";
+import About from "./sections/About";
 import Contact from "./sections/Contact";
 import Footer from "./sections/Footer";
-import AllProjects from "./sections/AllProjects";
-import ProjectDetail from "./sections/ProjectDetail";
-import "./App.css"; // Add loading styles here
+import "./App.css";
 
-const MainLayout = () => {
+// ─── LOADING SCREEN COMPONENT ───
+const LoadingScreen = ({ onFinish }) => {
   useEffect(() => {
-    const hash = window.location.hash;
-    if (hash) {
-      const id = hash.replace("#", "");
-      const el = document.getElementById(id);
-      if (el) {
-        // Small delay to ensure components are rendered
-        setTimeout(() => {
-          el.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 100);
-      }
-    }
-  }, []);
+    const timer = setTimeout(() => onFinish(), 3500);
+    return () => clearTimeout(timer);
+  }, [onFinish]);
 
   return (
-    <>
-      <Navbar />
-      <main className="container mx-auto px-4 pt-24 pb-16 space-y-24">
-        <Hero />
-        <TechStack />
-        <Projects />
-        <ContentCreator />
-        <About />
-        <Timeline />
-        <Contact />
-      </main>
-      <Footer />
-    </>
+    <div className="loading-screen">
+      <motion.div className="scroll-wrapper">
+        {/* Top Roller */}
+        <motion.div
+          className="scroll-roller top"
+          initial={{ y: 90 }}
+          animate={{ y: 0 }}
+          transition={{ duration: 1.2, ease: "circOut" }}
+        />
+
+        {/* Parchment Paper */}
+        <motion.div
+          className="scroll-paper"
+          initial={{ height: 0 }}
+          animate={{ height: 200 }}
+          transition={{ duration: 1.2, ease: "circOut" }}
+        >
+          <motion.div
+            className="loading-content"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2, duration: 0.8 }}
+          >
+            <div className="loading-logo">DR</div>
+            <p className="loading-text">Chronicling Ancient Legends...</p>
+            <div className="loading-progress-container">
+              <motion.div
+                className="loading-progress-bar"
+                initial={{ width: 0 }}
+                animate={{ width: "100%" }}
+                transition={{ delay: 1.5, duration: 1.8, ease: "easeInOut" }}
+              />
+              <motion.span
+                className="quill-loader"
+                initial={{ left: 0 }}
+                animate={{ left: "100%" }}
+                transition={{ delay: 1.5, duration: 1.8, ease: "easeInOut" }}
+              >
+                ✒️
+              </motion.span>
+            </div>
+          </motion.div>
+        </motion.div>
+
+        {/* Bottom Roller */}
+        <motion.div
+          className="scroll-roller bottom"
+          initial={{ y: -90 }}
+          animate={{ y: 0 }}
+          transition={{ duration: 1.2, ease: "circOut" }}
+        />
+      </motion.div>
+    </div>
   );
 };
 
-function App() {
-  const [isLoading, setIsLoading] = useState(true);
+// ─── MAIN LAYOUT ───
+const MainLayout = () => {
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-    // Simulate loading time (adjust as needed)
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2800); // 2.8 seconds for smooth experience
-
-    return () => clearTimeout(timer);
+    const handleMouse = (e) => setMousePos({ x: e.clientX, y: e.clientY });
+    window.addEventListener("mousemove", handleMouse);
+    return () => window.removeEventListener("mousemove", handleMouse);
   }, []);
 
-  // Loading Screen
-  if (isLoading) {
-    return (
-      <div className="loading-screen">
-        <motion.div
-          className="loader-container"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          {/* Animated Logo */}
-          <motion.div
-            className="logo-circle"
-            animate={{
-              scale: [1, 1.1, 1],
-              rotate: [0, 180, 360],
-              borderRadius: ["20%", "50%", "20%"],
-            }}
-            transition={{
-              duration: 2.5,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          >
-            <motion.div
-              className="logo-inner"
-              animate={{
-                scale: [1, 1.05, 1],
-                backgroundColor: ["#14b8a6", "#22d3ee", "#3b82f6", "#14b8a6"],
-              }}
-              transition={{
-                duration: 2.5,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-            >
-              DR
-            </motion.div>
-          </motion.div>
-
-          {/* Loading Text */}
-          <motion.div
-            className="loading-text"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-          >
-            <div className="text-line">
-              <motion.span
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 1.5, delay: 0.8 }}
-                className="gradient-text"
-              >
-                Loading Portfolio...
-              </motion.span>
-            </div>
-            <div className="text-line">
-              <span>Full-Stack Developer & AI Engineer</span>
-            </div>
-          </motion.div>
-
-          {/* Progress Bar */}
-          <motion.div
-            className="progress-container"
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 2.5, ease: "easeInOut" }}
-          >
-            <motion.div
-              className="progress-fill"
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 0.92 }} // 92% to show it's almost done
-              transition={{ duration: 2.5, ease: [0.22, 1, 0.36, 1] }}
-            />
-          </motion.div>
-
-          {/* Floating Particles */}
-          <div className="particles">
-            {[...Array(12)].map((_, i) => (
-              <motion.div
-                key={i}
-                className="particle"
-                animate={{
-                  y: [-20, 20, -20],
-                  x: [0, 15, -15, 0],
-                  opacity: [0.4, 1, 0.4],
-                }}
-                transition={{
-                  duration: 3 + i * 0.2,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              />
-            ))}
-          </div>
-
-          {/* Skill Sparks */}
-          <div className="skill-sparks">
-            {["React", "Django", "AI", "Spring"].map((skill, i) => (
-              <motion.span
-                key={skill}
-                className="skill-spark"
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{
-                  opacity: [0, 1, 0],
-                  scale: [0, 1, 0],
-                }}
-                transition={{
-                  duration: 1.5,
-                  repeat: Infinity,
-                  delay: i * 0.3,
-                }}
-              >
-                {skill}
-              </motion.span>
-            ))}
-          </div>
-        </motion.div>
-      </div>
-    );
-  }
-
-  // Main App Content with React Router
   return (
-    <>
+    <div className="app-root">
+      {/* Background Effects */}
+      <LeafBackground />
+      <div className="grain-overlay" />
+      <div
+        className="mouse-glow"
+        style={{ left: mousePos.x, top: mousePos.y }}
+      />
+
+      <Navbar />
+
+      <main className="container">
+        <Hero />
+        <Stats />
+        <About />
+        <TechStack />
+        <Projects />
+        <Certifications />
+        <Timeline />
+        <Contact />
+      </main>
+
+      <Footer />
+    </div>
+  );
+};
+
+// ─── APP ENTRY ───
+function App() {
+  const [loading, setLoading] = useState(true);
+
+  return (
+    <ThemeProvider>
       <AnimatePresence mode="wait">
-        <motion.div
-          key="app"
-          className="app-root"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <BackgroundOrbs />
-          <Router>
-            <Routes>
-              <Route path="/" element={<MainLayout />} />
-              <Route path="/projects" element={<AllProjects projects={projects} />} />
-              <Route path="/projects/:id" element={<ProjectDetail projects={projects} />} />
-            </Routes>
-          </Router>
-        </motion.div>
+        {loading ? (
+          <LoadingScreen key="loading" onFinish={() => setLoading(false)} />
+        ) : (
+          <motion.div
+            key="main"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1 }}
+          >
+            <Router>
+              <Routes>
+                <Route path="/" element={<MainLayout />} />
+              </Routes>
+            </Router>
+          </motion.div>
+        )}
       </AnimatePresence>
-    </>
+    </ThemeProvider>
   );
 }
 
