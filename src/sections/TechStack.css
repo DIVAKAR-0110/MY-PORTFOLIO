@@ -1,106 +1,225 @@
-/* TechStack.css */
-.techstack-section {
-  padding: 4rem 1.5rem 2rem;
+/* TechStack.css - SACRED TECH SHRINE */
+.tech-shrine-section {
+  padding: 6rem 2rem 4rem;
+  min-height: 120vh;
   position: relative;
+  background: linear-gradient(135deg, #1a0f08 0%, #2a1a10 50%, #0a0502 100%);
+  overflow: hidden;
 }
 
-.tech-filters {
+.shrine-header {
+  text-align: center;
+  margin-bottom: 5rem;
+}
+
+.shrine-crest {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.8));
+  animation: crestGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes crestGlow {
+  0% {
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.6));
+  }
+
+  100% {
+    filter: drop-shadow(0 0 40px rgba(255, 215, 0, 1));
+  }
+}
+
+.shrine-title {
+  font-family: 'Cinzel Decorative', cursive;
+  font-size: clamp(3rem, 7vw, 5rem);
+  background: linear-gradient(45deg, #FFD700, #D4AF37);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin: 0 0 1rem;
+  letter-spacing: 3px;
+}
+
+.shrine-subtitle {
+  font-family: 'Lora', serif;
+  font-size: 1.3rem;
+  color: rgba(232, 209, 167, 0.8);
+  font-style: italic;
+}
+
+.crystal-filters {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.6rem;
-  margin-bottom: 3.5rem;
+  gap: 1.2rem;
+  margin-bottom: 4rem;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.tech-filter-btn {
-  position: relative;
-  padding: 0.6rem 1.4rem;
+.crystal-btn {
+  padding: 1rem 2rem;
   font-family: 'Cinzel', serif;
-  font-size: 0.78rem;
+  font-size: 1rem;
   font-weight: 700;
-  color: var(--text-muted);
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: 2px;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(26, 15, 8, 0.9);
+  border: 2px solid rgba(212, 175, 55, 0.4);
+  border-radius: 25px;
   cursor: pointer;
-  transition: all 0.25s;
-  letter-spacing: 0.1em;
+  backdrop-filter: blur(15px);
+  transition: all 0.4s ease;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
 }
 
-.tech-filter-btn:hover { color: var(--text); border-color: var(--accent); }
-.tech-filter-btn.active { color: var(--text-inverse); border-color: transparent; }
-
-.filter-nav-bg {
-  position: absolute;
-  inset: -1px;
-  background: linear-gradient(135deg, var(--accent-dark), var(--accent));
-  z-index: -1;
-  border-radius: 2px;
-}
-
-.tech-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 1.5rem;
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-.tech-slate-card {
-  background: var(--bg-card);
-  border: 1.5px solid var(--border);
-  border-radius: 4px;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.25rem;
-  box-shadow: var(--shadow-sm);
-  transition: all 0.3s ease;
-}
-
-.tech-slate-card:hover {
-  border-color: var(--border-accent);
-  box-shadow: var(--shadow-md);
+.crystal-btn:hover {
+  border-color: #FFD700;
+  background: rgba(255, 215, 0, 0.1);
+  box-shadow: 0 15px 40px rgba(255, 215, 0, 0.3);
   transform: translateY(-5px);
 }
 
-.tech-icon-wrapper {
-  width: 100px;
-  height: 100px;
-  position: relative;
+.crystal-btn.active {
+  background: linear-gradient(135deg, #FFD700, #D4AF37);
+  color: #1a0f08;
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.7);
 }
 
-.tech3d-icon {
+.relic-chamber {
+  height: 75vh;
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.8);
+}
+
+.relic-chamber canvas {
+  border-radius: 24px !important;
+}
+
+.relic-label {
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(25px);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  min-width: 140px;
+  text-align: center;
+}
+
+.tech-relic-display {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+}
+
+.relic-icon {
+  font-size: 2.2rem;
+  margin-bottom: 0.4rem;
+  display: block;
+}
+
+.relic-name {
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.shrine-legend {
+  max-width: 1000px;
+  margin: 5rem auto 0;
+}
+
+.legend-scroll {
+  background: rgba(26, 15, 8, 0.9);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 3rem;
+  border: 2px solid rgba(212, 175, 55, 0.3);
+  text-align: center;
+}
+
+.legend-scroll h3 {
+  font-family: 'Cinzel Decorative', cursive;
+  font-size: 2rem;
+  color: #FFD700;
+  margin-bottom: 2.5rem;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+.legend-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1.5rem;
+}
+
+.legend-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1.5rem;
+  background: rgba(42, 26, 15, 0.5);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.legend-item:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 50px rgba(255, 215, 0, 0.2);
+}
+
+.legend-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  filter: drop-shadow(0 0 10px rgba(0,0,0,0.15));
+  font-size: 1.5rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+  flex-shrink: 0;
 }
 
-.tech-slate-info { text-align: center; }
-
-.tech-slate-name {
-  font-family: 'Cinzel', serif;
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 0.2rem;
-}
-
-.tech-slate-cat {
+.legend-item span {
   font-family: 'Lora', serif;
-  font-size: 0.72rem;
-  color: var(--accent);
-  font-style: italic;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
+  font-size: 0.95rem;
+  color: rgba(232, 209, 167, 0.95);
+  text-align: center;
+  font-weight: 500;
 }
 
-.tech-global-canvas {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  pointer-events: none;
-  z-index: 1000;
+/* Mobile */
+@media (max-width: 768px) {
+  .tech-shrine-section {
+    padding: 4rem 1rem 2rem;
+  }
+
+  .crystal-filters {
+    gap: 1rem;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .relic-chamber {
+    height: 65vh;
+  }
+
+  .legend-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .shrine-title {
+    font-size: 2.5rem;
+  }
+
+  .legend-scroll {
+    padding: 2rem 1.5rem;
+  }
 }
