@@ -12,6 +12,33 @@
   overflow: hidden;
 }
 
+/* ── COMPASS DECORATION ── */
+.hero-compass-layer {
+  position: absolute;
+  top: 43%;
+  right: 1%;
+  z-index: 1;
+  /* Behind content but above background */
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+@media (max-width: 1024px) {
+  .hero-compass-layer {
+    right: -10%;
+    transform: scale(0.8);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-compass-layer {
+    top: 5%;
+    right: -20%;
+    transform: scale(0.6);
+    opacity: 0.3;
+  }
+}
+
 /* ── IDENTITY ── */
 .hero-identity {
   display: flex;
@@ -124,7 +151,10 @@
 }
 
 @media (max-width: 600px) {
-  .universe-heading { white-space: normal; font-size: 1rem; }
+  .universe-heading {
+    white-space: normal;
+    font-size: 1rem;
+  }
 }
 
 .universe-scroll-left,
@@ -219,7 +249,10 @@
   color: #FDEFC8;
 }
 
-.btn-journey-icon { font-size: 0.9rem; color: var(--accent-light); }
+.btn-journey-icon {
+  font-size: 0.9rem;
+  color: var(--accent-light);
+}
 
 .btn-resume {
   display: inline-flex;
@@ -346,7 +379,9 @@
   border: none;
 }
 
-.modal-btn.download:hover { background: var(--accent); }
+.modal-btn.download:hover {
+  background: var(--accent);
+}
 
 .modal-btn.close {
   background: rgba(139, 58, 30, 0.12);
@@ -355,13 +390,30 @@
   padding: 0.5rem;
 }
 
-.modal-btn.close:hover { background: rgba(139, 58, 30, 0.25); }
+.modal-btn.close:hover {
+  background: rgba(139, 58, 30, 0.25);
+}
 
-.resume-modal-body { flex-grow: 1; width: 100%; }
-.resume-iframe { width: 100%; height: 100%; border: none; }
+.resume-modal-body {
+  flex-grow: 1;
+  width: 100%;
+}
+
+.resume-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
 
 /* ── RESPONSIVE ── */
 @media (max-width: 600px) {
-  .hero-section { padding: 2rem 1rem 3rem; gap: 1.5rem; }
-  .btn-journey { padding: 0.8rem 1.5rem; font-size: 0.78rem; }
+  .hero-section {
+    padding: 2rem 1rem 3rem;
+    gap: 1.5rem;
+  }
+
+  .btn-journey {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.78rem;
+  }
 }

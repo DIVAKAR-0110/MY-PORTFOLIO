@@ -5,14 +5,11 @@ import { useState } from "react";
 import "./Hero.css";
 import AncientGlobe from "../components/AncientGlobe";
 import JourneyMap from "../components/JourneyMap";
+import AncientCompass from "../components/AncientCompass";
 
 function Hero() {
-  const [showResume, setShowResume] = useState(false);
+  const [showResume,  setShowResume]  = useState(false);
   const [showJourney, setShowJourney] = useState(false);
-
-  const handleScroll = (id) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-  };
 
   return (
     <>
@@ -23,6 +20,16 @@ function Hero() {
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
       >
+        {/* ── COMPASS DECORATION ── */}
+        <motion.div 
+          className="hero-compass-layer"
+          initial={{ opacity: 0, scale: 0.8, rotate: -20 }}
+          animate={{ opacity: 1, scale: 1, rotate: 0 }}
+          transition={{ duration: 1.5, delay: 0.5 }}
+        >
+          <AncientCompass />
+        </motion.div>
+
         {/* ── IDENTITY ── */}
         <motion.div
           className="hero-identity"

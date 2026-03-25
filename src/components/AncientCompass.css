@@ -1,0 +1,176 @@
+/* src/components/AncientCompass.css */
+.ancient-compass-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 250px;
+  height: 250px;
+  pointer-events: none; /* Let clicks pass through */
+  opacity: 0.8;
+  filter: drop-shadow(0 0 15px rgba(139, 58, 30, 0.4));
+}
+
+.compass-outer-ring {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 4px solid var(--accent-dark);
+  border-top-color: var(--accent);
+  border-bottom-color: var(--accent);
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 0, 0, 0.5);
+  animation: spin-slow-reverse 40s linear infinite;
+}
+
+.compass-inner-ring {
+  width: 85%;
+  height: 85%;
+  border-radius: 50%;
+  border: 2px dashed var(--accent);
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle, rgba(139, 58, 30, 0.1) 0%, transparent 70%);
+  animation: spin-slow 25s linear infinite;
+}
+
+/* Decorative border inside inner ring */
+.compass-markings {
+  position: absolute;
+  width: 95%;
+  height: 95%;
+  border-radius: 50%;
+  border: 1px dotted var(--text-faint);
+  opacity: 0.5;
+}
+
+/* Typography for Cardinal & Ordinal points */
+.cardinal-point, .ordinal-point {
+  position: absolute;
+  font-family: 'Cinzel Decorative', serif;
+  font-weight: 700;
+  text-shadow: 0 0 5px var(--accent-glow);
+}
+
+.cardinal-point {
+  color: var(--accent);
+  font-size: 1.2rem;
+}
+
+.ordinal-point {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-family: 'Cinzel', serif;
+}
+
+/* Positioning Directions */
+.north { top: 4%; left: 50%; transform: translateX(-50%); }
+.south { bottom: 4%; left: 50%; transform: translateX(-50%); }
+.east { top: 50%; right: 4%; transform: translateY(-50%); }
+.west { top: 50%; left: 4%; transform: translateY(-50%); }
+
+.ne { top: 15%; right: 15%; transform: translate(-50%, -50%); }
+.nw { top: 15%; left: 15%; transform: translate(50%, -50%); }
+.se { bottom: 15%; right: 15%; transform: translate(-50%, 50%); }
+.sw { bottom: 15%; left: 15%; transform: translate(50%, 50%); }
+
+/* Compass Star Setup */
+.compass-star {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.needle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: bottom center;
+}
+
+/* Main Needles (N, S, E, W) */
+.needle-n, .needle-s, .needle-e, .needle-w {
+  width: 0;
+  height: 38%;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  bottom: 50%;
+}
+
+.needle-n { 
+  border-bottom: 90px solid var(--accent);
+  transform: translateX(-50%) rotate(0deg);
+}
+/* Right half shading for 3D effect on North */
+.needle-n::after {
+  content: "";
+  position: absolute;
+  top: 0; right: -10px;
+  border-left: 10px solid transparent;
+  border-right: 0px solid transparent;
+  border-bottom: 90px solid var(--accent-dark);
+}
+
+.needle-s {
+  border-bottom: 90px solid var(--bg-secondary);
+  transform: translateX(-50%) rotate(180deg);
+}
+.needle-e {
+  border-bottom: 90px solid var(--bg-secondary);
+  transform: translateX(-50%) rotate(90deg);
+}
+.needle-w {
+  border-bottom: 90px solid var(--bg-secondary);
+  transform: translateX(-50%) rotate(270deg);
+}
+
+/* Minor Needles (NE, NW, SE, SW) */
+.needle-ne, .needle-nw, .needle-se, .needle-sw {
+  width: 0;
+  height: 25%;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 60px solid var(--border-accent);
+  bottom: 50%;
+}
+
+.needle-ne { transform: translateX(-50%) rotate(45deg); }
+.needle-nw { transform: translateX(-50%) rotate(-45deg); }
+.needle-se { transform: translateX(-50%) rotate(135deg); }
+.needle-sw { transform: translateX(-50%) rotate(-135deg); }
+
+/* Center Hub */
+.compass-center {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--accent-glow);
+  z-index: 2;
+  border: 2px solid var(--bg-card);
+}
+
+/* Animations */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spin-slow-reverse {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
+/* Scale for mobile */
+@media (max-width: 600px) {
+  .ancient-compass-container {
+    width: 200px;
+    height: 200px;
+  }
+}

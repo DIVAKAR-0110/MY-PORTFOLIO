@@ -1,7 +1,7 @@
 // src/sections/Footer.jsx
+import { useState, useEffect } from "react";
 import "./Footer.css";
-import { FiGithub, FiLinkedin, FiMail, FiArrowUp } from "react-icons/fi";
-import { useTheme } from "../context/ThemeContext";
+import { FiGithub, FiLinkedin, FiMail, FiArrowUp, FiClock } from "react-icons/fi";
 
 const quickLinks = [
   { id: "hero",     label: "Home"      },
@@ -13,7 +13,18 @@ const quickLinks = [
 ];
 
 function Footer() {
-  const { theme } = useTheme();
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatDateTime = (date) => {
+    const dateStr = date.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
+    const timeStr = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+    return `${dateStr.toUpperCase()} ✦ ${timeStr}`;
+  };
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -37,6 +48,13 @@ function Footer() {
           <p className="footer-tagline">
             Building the legacies of tomorrow with the wisdom of the ancients.
           </p>
+          
+          <div className="footer-datetime-box">
+            <div className="datetime-glow" />
+            <FiClock className="datetime-icon" />
+            <span className="datetime-value">{formatDateTime(currentTime)}</span>
+          </div>
+
           <div className="footer-socials">
             <a href="https://github.com/DIVAKAR-0110" target="_blank" rel="noreferrer" aria-label="GitHub"><FiGithub /></a>
             <a href="https://www.linkedin.com/in/r-divakar-482212303/" target="_blank" rel="noreferrer" aria-label="LinkedIn"><FiLinkedin /></a>
