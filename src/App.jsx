@@ -49,7 +49,7 @@ const LoadingScreen = ({ onFinish }) => {
             transition={{ delay: 1.2, duration: 0.8 }}
           >
             <div className="loading-logo">DR</div>
-            <p className="loading-text">Chronicling Ancient Legends...</p>
+            <p className="loading-text">Documenting Legendary Stories 🌟😎</p>
             <div className="loading-progress-container">
               <motion.div
                 className="loading-progress-bar"

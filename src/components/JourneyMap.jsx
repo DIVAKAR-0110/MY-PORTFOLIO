@@ -1,123 +1,198 @@
 // src/components/JourneyMap.jsx
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, PerspectiveCamera, Html, Text, Line, Float } from "@react-three/drei";
+import { OrbitControls, PerspectiveCamera, Html, Text, Line, Float, useGLTF, Sparkles, ContactShadows, Cloud } from "@react-three/drei";
 import { useState, useRef, useMemo, Suspense, useEffect } from "react";
 import * as THREE from "three";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import "./JourneyMap.css";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiX, FiMapPin } from "react-icons/fi";
+import { EffectComposer, Bloom, Noise, Vignette } from "@react-three/postprocessing";
+
+// --- CUSTOM SHADERS & MATERIALS ---
+
+const WaterShader = {
+  uniforms: {
+    uTime: { value: 0 },
+    uColor: { value: new THREE.Color("#51a9ad") },
+    uAlpha: { value: 0.4 }
+  },
+  vertexShader: `
+    varying vec2 vUv;
+    uniform float uTime;
+    void main() {
+      vUv = uv;
+      vec3 pos = position;
+      pos.z += sin(pos.x * 2.0 + uTime) * 0.1 + cos(pos.y * 2.0 + uTime) * 0.1;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+    }
+  `,
+  fragmentShader: `
+    varying vec2 vUv;
+    uniform float uTime;
+    uniform vec3 uColor;
+    uniform float uAlpha;
+    void main() {
+      float noise = sin(vUv.x * 20.0 + uTime) * 0.1 + sin(vUv.y * 20.0 - uTime) * 0.1;
+      gl_FragColor = vec4(uColor + noise, uAlpha);
+    }
+  `
+};
 
 const MODULES = [
   {
-    id: "about", num: 1, label: "The Scholar", icon: "📚", pos: [-12, 0.5, 8], color: "#b71c1c",
+    id: "about", num: 1, label: "Starting Shore", icon: "🏝️", pos: [-12, 0.5, 15], color: "#b71c1c",
     scrollContent: (
       <div className="ancient-script-content">
-        <h3 className="script-title">🎓 The Scholar’s Origins</h3>
+        <h3 className="script-title">🎓 The Journey Begins</h3>
         <p className="script-paragraph">In the year of 2023, the quest began at the great halls of CIT Coimbatore. A specialized focus in AI/ML and Fullstack sorcery guided the path to a 7.92 CGPA in M.Sc. Software Systems.</p>
         <ul className="script-list">
           <li>Master of Science (Software Systems) — 2023-2025.</li>
           <li>Residing in the coastal lands of Chennai, Tamil Nadu.</li>
-          <li>Devoted to crafting logic and breathing life into UI.</li>
         </ul>
       </div>
     )
   },
   {
-    id: "stack", num: 2, label: "Tech Arsenal", icon: "💻", pos: [-4, 0.5, 3], color: "#c62828",
+    id: "stack", num: 2, label: "Tech Jungle", icon: "⚔️", pos: [-6, 0.5, 6], color: "#c62828",
     scrollContent: (
       <div className="ancient-script-content">
         <h3 className="script-title">🛠️ The Armory of Codes</h3>
-        <p className="script-paragraph">A traveler must be equipped with the sharpest of tools to survive the digital ocean. The arsenal includes front-end mastery and back-end fortresses.</p>
+        <p className="script-paragraph">A traveler must be equipped with the sharpest of tools. The arsenal includes front-end mastery and back-end fortresses.</p>
         <div className="rune-grid">
           <span>React & Next.js</span><span>Spring Boot</span><span>Django Python</span>
           <span>TensorFlow AI</span><span>Three.js 3D</span><span>Tailwind CSS</span>
-          <span>PostgreSQL</span><span>Docker Containers</span>
         </div>
       </div>
     )
   },
   {
-    id: "projects", num: 3, label: "Epic Projects", icon: "⭐", pos: [2, 0.5, -4], color: "#d32f2f",
+    id: "exp", num: 3, label: "Pirate's Cove", icon: "⚓", pos: [-16, 0.5, -4], color: "#d32f2f",
+    scrollContent: (
+      <div className="ancient-script-content">
+        <h3 className="script-title">💼 Professional Quests</h3>
+        <p className="script-paragraph">Arduous journeys through the professional realm, solving real-world problems with code and logic.</p>
+        <ul className="script-list">
+          <li>Fullstack Developer Intern — Tech Solutions (2024)</li>
+          <li>AI/ML Research Assistant — CIT Archives (2023)</li>
+          <li>Freelance Sorcerer — Global Kingdoms (2022-Present)</li>
+        </ul>
+      </div>
+    )
+  },
+  {
+    id: "projects", num: 4, label: "Monument Valley", icon: "🔱", pos: [-4, 0.5, -10], color: "#e53935",
     scrollContent: (
       <div className="ancient-script-content">
         <h3 className="script-title">🚀 Monuments Built</h3>
-        <p className="script-paragraph">Great monuments were erected using the tech arsenal. Each structure pushed the boundaries of modern engineering and design.</p>
+        <p className="script-paragraph">Great monuments were erected using the tech arsenal. Each structure pushed the boundaries of modern engineering.</p>
         <div className="script-project">
-          <h4>🌐 The Ancient Orb Portfolio</h4>
-          <p>A magical 3D experience blending React Three Fiber with Framer Motion.</p>
+          <h4>🌐 Ancient Orb Portfolio</h4>
+          <p>A magical 3D experience blending R3F with Framer Motion.</p>
         </div>
         <div className="script-project">
-          <h4>⚙️ The ERP Dashboard Citadel</h4>
-          <p>A towering administrative fortress built on Spring Boot & PostgreSQL.</p>
-        </div>
-        <div className="script-project">
-          <h4>🤖 AI Sentinel Complaint System</h4>
-          <p>A cognitive network filtering citizen grievances using Django and TensorFlow.</p>
+          <h4>🤖 AI Sentinel System</h4>
+          <p>A cognitive network for grievances using Django and TensorFlow.</p>
         </div>
       </div>
     )
   },
   {
-    id: "certs", num: 4, label: "Certifications", icon: "🏆", pos: [9, 0.5, -10], color: "#e53935",
+    id: "skills", num: 5, label: "Crystal Caves", icon: "⚡", pos: [6, 0.5, -12], color: "#f44336",
+    scrollContent: (
+      <div className="ancient-script-content">
+        <h3 className="script-title">⚡ Innate Abilities</h3>
+        <p className="script-paragraph">Specialized skills honed through years of practice and deep focus.</p>
+        <ul className="script-list">
+          <li>Algorithm Mastery (LeetCode 500+)</li>
+          <li>System Design & Architecture Thinking</li>
+          <li>UI/UX Empathy & Responsive Design</li>
+        </ul>
+      </div>
+    )
+  },
+  {
+    id: "certs", num: 6, label: "Mount Wisdom", icon: "📜", pos: [16, 0.5, -5], color: "#ff5252",
     scrollContent: (
       <div className="ancient-script-content">
         <h3 className="script-title">📜 Scrolls of Mastery</h3>
-        <p className="script-paragraph">The masters of the realm bestowed these certificates upon completing arduous trials of knowledge.</p>
+        <p className="script-paragraph">The masters of the realm bestowed these certificates upon completing arduous trials.</p>
         <ul className="script-list">
-          <li>IBM AI Engineering Professional Certificate</li>
+          <li>IBM AI Engineering Professional</li>
           <li>Master of the MERN Stack</li>
-          <li>AWS Cloud Practitioner Ascension</li>
-          <li>Google TensorFlow Developer Recognition</li>
+          <li>Google TensorFlow Developer</li>
         </ul>
       </div>
     )
   },
   {
-    id: "awards", num: 5, label: "Triumphs", icon: "🎖️", pos: [16, 0.5, -16], color: "#f44336",
+    id: "hobbies", num: 7, label: "Zen Island", icon: "🏔️", pos: [10, 0.5, 5], color: "#ff1744",
+    scrollContent: (
+      <div className="ancient-script-content">
+        <h3 className="script-title">❤️ Life Beyond Code</h3>
+        <p className="script-paragraph">Even a mage needs to rest and seek inspiration from other realms.</p>
+        <ul className="script-list">
+          <li>🏔️ Trekking through pixelated mountains</li>
+          <li>📸 Capturing the beauty of digital light</li>
+          <li> estrategic duels and reading philosophy</li>
+        </ul>
+      </div>
+    )
+  },
+  {
+    id: "awards", num: 8, label: "Victory Valley", icon: "🏅", pos: [5, 0.5, 15], color: "#d50000",
     scrollContent: (
       <div className="ancient-script-content">
         <h3 className="script-title">🏅 Triumphs in Battle</h3>
-        <p className="script-paragraph">Songs are sung across the lands of these great victories in the arenas of logic and speed.</p>
+        <p className="script-paragraph">Songs are sung of these great victories in the arenas of logic and speed.</p>
         <ul className="script-list">
-          <li>🥇 Victor of the 2025 Grand Hackathon</li>
-          <li>⭐ Crowned GitHub Star Developer</li>
-          <li>⚡ Ascended to LeetCode Top 2% Rankings</li>
-          <li>🎓 Acknowledged in Published Research Archives</li>
+          <li>🥇 Victor of 2025 Grand Hackathon</li>
+          <li>⭐ GitHub Star Developer</li>
+          <li>⚡ LeetCode Top 2% Rankings</li>
         </ul>
+      </div>
+    )
+  },
+  {
+    id: "cont", num: 9, label: "The X Mark", icon: "🦅", pos: [18, 0.5, 18], color: "#b71c1c",
+    scrollContent: (
+      <div className="ancient-script-content">
+        <h3 className="script-title">⚔️ Join the Quest</h3>
+        <p className="script-paragraph">If you wish to embark on a quest together, send a raven to my citadel.</p>
+        <ul className="script-list">
+          <li>📧 Email: divakar.dev@quest.com</li>
+          <li>📱 LinkedIn: /in/divakarmagic</li>
+          <li>🔗 GitHub: github.com/divakar-ai</li>
+        </ul>
+      </div>
+    )
+  },
+  {
+    id: "secret", num: "?", label: "Hidden Cove", icon: "💎", pos: [-25, 0.5, 25], color: "#ffab00",
+    scrollContent: (
+      <div className="ancient-script-content">
+        <h3 className="script-title">💎 The Hidden Gem</h3>
+        <p className="script-paragraph drop-cap">Did you know? I once built a full 3D game engine inside a browser just for fun! This map is a glimpse into that passion for the "extra mile".</p>
       </div>
     )
   }
 ];
 
-// --- ENHANCED 3D TOPOGRAPHY COMPONENTS & ORIGINAL LOADERS ---
+// --- ENHANCED 3D TOPOGRAPHY COMPONENTS & LOADERS ---
 
-function SafeModel({ path, fallback, scale = 1, position, rotation = [0,0,0] }) {
-  const [model, setModel] = useState(null);
-  const [error, setError] = useState(false);
+function Model({ path, scale = 1, position, rotation = [0, 0, 0] }) {
+  const { scene } = useGLTF(path);
+  const clonedScene = useMemo(() => scene.clone(), [scene]);
 
   useEffect(() => {
-    const loader = new GLTFLoader();
-    loader.load(
-      path,
-      (gltf) => {
-        gltf.scene.traverse((node) => {
-          if (node.isMesh) { node.castShadow = true; node.receiveShadow = true; }
-        });
-        setModel(gltf.scene);
-      },
-      undefined,
-      (err) => {
-        console.warn(`Original Model not found at ${path}, using enhanced visual fallback.`);
-        setError(true);
+    clonedScene.traverse((node) => {
+      if (node.isMesh) {
+        node.castShadow = true;
+        node.receiveShadow = true;
       }
-    );
-  }, [path]);
+    });
+  }, [clonedScene]);
 
-  if (error || !model) {
-    return <group position={position} rotation={rotation} scale={scale}>{fallback()}</group>;
-  }
-  return <primitive object={model} position={position} rotation={rotation} scale={scale} />;
+  return <primitive object={clonedScene} position={position} rotation={rotation} scale={[scale, scale, scale]} />;
 }
 
 function VolcanoSmoke() {
@@ -129,15 +204,15 @@ function VolcanoSmoke() {
         p.scale.x = p.scale.y = p.scale.z += 0.01;
         p.material.opacity -= 0.005;
         if (p.position.y > 6) {
-          p.position.y = 0; p.scale.set(1,1,1); p.material.opacity = 0.6;
+          p.position.y = 0; p.scale.set(1, 1, 1); p.material.opacity = 0.6;
         }
       });
     }
   });
   return (
-    <group ref={particles} position={[0, 9, 0]}>
+    <group ref={particles} position={[0, 5, 0]}>
       {Array.from({ length: 15 }).map((_, i) => (
-        <mesh key={i} position={[(Math.random()-0.5)*2, Math.random()*5, (Math.random()-0.5)*2]}>
+        <mesh key={i} position={[(Math.random() - 0.5) * 2, Math.random() * 5, (Math.random() - 0.5) * 2]}>
           <sphereGeometry args={[0.5, 8, 8]} />
           <meshBasicMaterial color="#555555" transparent opacity={0.6} />
         </mesh>
@@ -159,7 +234,7 @@ function Fireflies() {
   return (
     <group ref={group}>
       {Array.from({ length: 25 }).map((_, i) => (
-        <mesh key={i} position={[(Math.random()-0.5)*12, Math.random()*5, (Math.random()-0.5)*12]}>
+        <mesh key={i} position={[(Math.random() - 0.5) * 12, Math.random() * 5, (Math.random() - 0.5) * 12]}>
           <sphereGeometry args={[0.08, 4, 4]} />
           <meshBasicMaterial color="#b2ff59" />
           <pointLight color="#b2ff59" intensity={0.5} distance={2} />
@@ -169,202 +244,220 @@ function Fireflies() {
   );
 }
 
-function PalmTree({ position, scale = 1 }) {
-  return (
-    <group position={position} scale={[scale, scale, scale]}>
-      <mesh position={[0, 1, 0]} rotation={[0, 0, 0.2]}><cylinderGeometry args={[0.1, 0.2, 2, 6]} /><meshLambertMaterial color="#5d4037" /></mesh>
-      <group position={[0.4, 2, 0]}>
-        {[0, 1, 2, 3, 4].map((i) => (
-          <mesh key={i} rotation={[Math.PI / 2.5, (i * Math.PI * 2) / 5, 0]}>
-            <sphereGeometry args={[0.4, 8, 4]} /><meshLambertMaterial color="#2e7d32" />
-          </mesh>
-        ))}
-      </group>
-    </group>
-  );
-}
-
 function MountainRange({ position }) {
-  const fallback = () => (
-    <group>
-      <mesh position={[0, 4, 0]} castShadow><coneGeometry args={[4, 8, 5]} /><meshLambertMaterial color="#4e342e" /></mesh>
-      <mesh position={[0, 6.5, 0]} castShadow><coneGeometry args={[1.5, 3, 5]} /><meshLambertMaterial color="#e0e0e0" /></mesh>
-      <mesh position={[-3, 2.5, 2]} rotation={[0.1, 0, -0.2]} castShadow><coneGeometry args={[3, 5, 4]} /><meshLambertMaterial color="#3e2723" /></mesh>
-      <mesh position={[3, 3, -1]} rotation={[-0.1, 0.5, 0.1]} castShadow><coneGeometry args={[3.5, 6, 6]} /><meshLambertMaterial color="#5d4037" /></mesh>
-      <VolcanoSmoke />
-      <Text position={[0, 12, 0]} fontSize={0.8} color="#d84315" anchorX="center" rotation={[0, -Math.PI/4, 0]}>Victory Volcano</Text>
+  return (
+    <group position={position}>
+      <Model path="/models/useGLTF/Volcano.glb" position={[0, 0, 0]} scale={0.8} />
+      <Text position={[0, 4, 0]} fontSize={0.5} color="#d84315" anchorX="center" rotation={[0, -Math.PI / 4, 0]}>Mount Wisdom</Text>
     </group>
   );
-  return <SafeModel path="/models/volcano.glb" position={position} fallback={fallback} scale={2} />;
 }
 
 function Desert({ position }) {
-  const fallback = () => (
-    <group>
-      <mesh position={[0, 0.5, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow><sphereGeometry args={[6, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2.5]} /><meshLambertMaterial color="#fbc02d" /></mesh>
-      <mesh position={[4, 0.3, -3]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow><sphereGeometry args={[4, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2.2]} /><meshLambertMaterial color="#f57f17" /></mesh>
-      <group position={[2, 1.5, 1]}>
-        <mesh castShadow><cylinderGeometry args={[0.2, 0.2, 3, 8]} /><meshLambertMaterial color="#1b5e20" /></mesh>
-        <mesh position={[0.5, 0.2, 0]} rotation={[0,0,-Math.PI/2]} castShadow><cylinderGeometry args={[0.15, 0.15, 1, 8]} /><meshLambertMaterial color="#1b5e20" /></mesh>
-      </group>
-      <Text position={[0, 4.5, 0]} fontSize={0.8} color="#e65100" anchorX="center" rotation={[0, -Math.PI/4, 0]}>Dry Gulch Desert</Text>
+  return (
+    <group position={position}>
+      <Model path="/models/useGLTF/Desert scene.glb" position={[0, 0, 0]} scale={0.4} rotation={[0, Math.PI / 4, 0]} />
+      <Text position={[0, 2.5, 0]} fontSize={0.5} color="#e65100" anchorX="center" rotation={[0, -Math.PI / 4, 0]}>Victory Valley</Text>
     </group>
   );
-  return <SafeModel path="/models/desert.glb" position={position} fallback={fallback} scale={1.5} />;
 }
 
 function HauntedForest({ position }) {
-  const fallback = () => (
-    <group>
-      {Array.from({ length: 6 }).map((_, i) => (
-        <group key={i} position={[(Math.random() - 0.5) * 6, 0, (Math.random() - 0.5) * 6]}>
-          <mesh position={[0, 1.5, 0]} rotation={[0, 0, (Math.random()-0.5)*0.3]}><cylinderGeometry args={[0.1, 0.3, 3, 5]} /><meshLambertMaterial color="#261b17" /></mesh>
-          <mesh position={[0, 3.2, 0]} rotation={[(Math.random()-0.5), Math.random() * Math.PI, (Math.random()-0.5)]} castShadow><coneGeometry args={[1.2, 2.5, 4]} /><meshLambertMaterial color="#0d2b10" opacity={0.9} transparent /></mesh>
-        </group>
-      ))}
-      <Fireflies />
-      <Text position={[0, 6, 0]} fontSize={0.8} color="#1b5e20" anchorX="center" rotation={[0, -Math.PI/4, 0]}>Haunted Forest</Text>
+  return (
+    <group position={position}>
+      <Model path="/models/useGLTF/Log.glb" position={[0, 0, 0]} scale={0.8} rotation={[0, Math.PI / 3, 0]} />
+      <Text position={[0, 2, 0]} fontSize={0.5} color="#1b5e20" anchorX="center" rotation={[0, -Math.PI / 4, 0]}>Log Cabin</Text>
     </group>
   );
-  return <SafeModel path="/models/forest.glb" position={position} fallback={fallback} scale={1.5} />;
 }
 
 function RealisticPirateShip({ position }) {
-  const fallback = () => {
-    const shipRef = useRef();
-    useFrame((state) => {
-      if (shipRef.current) {
-        shipRef.current.rotation.z = Math.sin(state.clock.elapsedTime * 1.5) * 0.08;
-        shipRef.current.position.y = Math.sin(state.clock.elapsedTime * 2) * 0.1;
-      }
-    });
-    return (
-      <group>
-        <mesh position={[0, 0.2, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow><circleGeometry args={[6, 32]} /><meshLambertMaterial color="#0277bd" transparent opacity={0.8} /></mesh>
-        <group ref={shipRef} position={[-1, 0.5, 1]} rotation={[0, -Math.PI/6, 0]}>
-          <mesh position={[0, 0.5, 0]} castShadow><cylinderGeometry args={[1, 0.6, 3, 8, 1, false, 0, Math.PI]} rotation={[0, 0, Math.PI/2]} /><meshLambertMaterial color="#212121" /></mesh>
-          <mesh position={[-1.8, 1.2, 0]} rotation={[0, 0, Math.PI/4]} castShadow><cylinderGeometry args={[0.05, 0.1, 1.5]} /><meshLambertMaterial color="#000000" /></mesh>
-          <mesh position={[-0.2, 2, 0]} castShadow><cylinderGeometry args={[0.08, 0.1, 4]} /><meshLambertMaterial color="#000000" /></mesh>
-          <mesh position={[-0.1, 1.5, 0]} rotation={[0, Math.PI/2, 0]} castShadow><cylinderGeometry args={[1, 1, 1.5, 16, 1, true, 0, Math.PI/1.5]} /><meshLambertMaterial color="#1a1a1a" side={THREE.DoubleSide} /></mesh>
-          <mesh position={[-0.2, 4.2, 0.3]} rotation={[0, Math.PI/2, 0]}><planeGeometry args={[0.6, 0.4]} /><meshLambertMaterial color="#b71c1c" side={THREE.DoubleSide} /></mesh>
-        </group>
-        <PalmTree position={[3, 0, -3]} scale={1.5} />
-        <PalmTree position={[4, 0, -1]} scale={1.2} />
-        <Text position={[0, 5, -2]} fontSize={0.8} color="#000000" anchorX="center" rotation={[0, -Math.PI/4, 0]}>Pirate's Cove</Text>
-      </group>
-    );
-  };
-  return <SafeModel path="/models/ship.glb" position={position} fallback={fallback} scale={2} rotation={[0, Math.PI/6, 0]} />;
-}
-
-function FrightfulFalls() {
-  const fallback = () => (
-    <group position={[3, 0, -6]}>
-      <mesh position={[0, 2, 0]} castShadow><boxGeometry args={[5, 4, 3]} /><meshLambertMaterial color="#4e342e" /></mesh>
-      <mesh position={[0, 2, 1.6]}><planeGeometry args={[2.5, 4.2]} /><meshBasicMaterial color="#4fc3f7" transparent opacity={0.85} /></mesh>
-      <group position={[0, 0.2, 2]}>
-        {Array.from({ length: 12 }).map((_, i) => (
-          <mesh key={i} position={[(Math.random()-0.5)*3, Math.random()*0.5, Math.random()*1]}>
-            <sphereGeometry args={[0.2, 8, 8]} /><meshBasicMaterial color="#ffffff" transparent opacity={0.6} />
-          </mesh>
-        ))}
-      </group>
-      <mesh position={[0, 0.15, 8]} rotation={[-Math.PI / 2, 0, Math.PI/12]} receiveShadow><planeGeometry args={[2, 16]} /><meshBasicMaterial color="#0288d1" transparent opacity={0.7} /></mesh>
-      <Text position={[0, 5, 0]} fontSize={0.8} color="#0288d1" anchorX="center" rotation={[0, -Math.PI/4, 0]}>Frightful Falls</Text>
+  return (
+    <group position={position}>
+      <Model path="/models/useGLTF/Small Ship.glb" position={[0, 0, 0]} scale={1.2} rotation={[0, Math.PI / 2, 0]} />
+      <Text position={[0, 2.5, -1]} fontSize={0.5} color="#000000" anchorX="center" rotation={[0, -Math.PI / 4, 0]}>Pirate's Cove</Text>
     </group>
   );
-  return <SafeModel path="/models/waterfall.glb" position={[0,0,0]} fallback={fallback} scale={1.5} />;
 }
+
+function FrightfulFalls({ position }) {
+  return (
+    <group position={position}>
+      <Model path="/models/useGLTF/Waterfall.glb" position={[0, 0, 0]} scale={1} rotation={[0, Math.PI, 0]} />
+      <Text position={[0, 3, 0]} fontSize={0.5} color="#0288d1" anchorX="center" rotation={[0, -Math.PI / 4, 0]}>Monument Falls</Text>
+    </group>
+  );
+}
+
+function ProximityLabel({ text, position, color }) {
+  const ref = useRef();
+  useFrame((state) => {
+    if (!ref.current) return;
+    const dist = state.camera.position.distanceTo(new THREE.Vector3(...position));
+    // Feature 9: Fade in only when close
+    ref.current.style.opacity = THREE.MathUtils.clamp(1.5 - dist / 30, 0, 1);
+  });
+  return (
+    <Html position={position} center transform ref={ref}>
+      <div className="proximity-label-text" style={{ color }}>{text}</div>
+    </Html>
+  );
+}
+
+function ScholarIsland({ position, label = "Scholar's Isle", isHovered }) {
+  return (
+    <group position={position}>
+      <Float speed={isHovered ? 5 : 1} rotationIntensity={isHovered ? 1 : 0.2}>
+        <Model path="/models/useGLTF/Island.glb" position={[0, 0, 0]} scale={0.8} />
+      </Float>
+      <ProximityLabel text={label} position={[0, 2.5, 0]} color="#5d4037" />
+    </group>
+  );
+}
+
+function TechRobot({ position, label = "Arsenal AI" }) {
+  return (
+    <group position={position}>
+      <Model path="/models/useGLTF/Robot.glb" position={[0, 0, 0]} scale={0.5} rotation={[0, Math.PI / 4, 0]} />
+      <Text position={[0, 1.8, 0]} fontSize={0.5} color="#c62828" anchorX="center" rotation={[0, -Math.PI / 4, 0]}>{label}</Text>
+    </group>
+  );
+}
+
+function SnowyPeaks({ position }) {
+  return (
+    <group position={position}>
+      <Model path="/models/useGLTF/TerrainSnow01.glb" position={[0, 0, 0]} scale={0.7} />
+      <Text position={[0, 2.8, 0]} fontSize={0.5} color="#b0bec5" anchorX="center" rotation={[0, -Math.PI / 4, 0]}>Frozen Frontier</Text>
+    </group>
+  );
+}
+
+// --- PRELOAD MODELS ---
+useGLTF.preload("/models/useGLTF/Volcano.glb");
+useGLTF.preload("/models/useGLTF/Desert scene.glb");
+useGLTF.preload("/models/useGLTF/Log.glb");
+useGLTF.preload("/models/useGLTF/Small Ship.glb");
+useGLTF.preload("/models/useGLTF/Waterfall.glb");
+useGLTF.preload("/models/useGLTF/Island.glb");
+useGLTF.preload("/models/useGLTF/Robot.glb");
+useGLTF.preload("/models/useGLTF/TerrainSnow01.glb");
+useGLTF.preload("/models/useGLTF/Pirate Captain.glb");
 
 // --- CORE MAP ---
 
+function SecretChest({ position, isHovered }) {
+  return (
+    <group position={position}>
+      <Float speed={isHovered ? 10 : 2} rotationIntensity={isHovered ? 2 : 0.5}>
+        <TreasurePin module={{ pos: [0, 0, 0], num: "?" }} active={isHovered} onClick={() => { }} isVisited={true} />
+      </Float>
+      <ProximityLabel text="???" position={[0, 2, 0]} color="#ffab00" />
+    </group>
+  );
+}
+
 function MapSurface() {
-  const canvas = useMemo(() => {
+  const waterRef = useRef();
+  const parchmentRef = useRef();
+
+  useFrame((state) => {
+    if (waterRef.current) waterRef.current.uniforms.uTime.value = state.clock.elapsedTime;
+    if (parchmentRef.current) {
+      parchmentRef.current.position.y = 0.1 + Math.sin(state.clock.elapsedTime * 0.5) * 0.05;
+      // Subtle edge flutter via vertex displacement if we had a raw shader, 
+      // but for now we'll float the whole plane for 'parallax'.
+    }
+  });
+
+  const parchmentTex = useMemo(() => {
     const c = document.createElement('canvas'); c.width = c.height = 1024;
     const ctx = c.getContext('2d');
-    
-    // Ancient dirty parchment background
-    ctx.fillStyle = '#f4e4bc'; 
-    ctx.fillRect(0, 0, 1024, 1024);
-    
-    // Add grit and age
-    for(let i=0; i<300; i++) {
-        ctx.fillStyle = `rgba(139, 69, 19, ${Math.random() * 0.05})`;
-        ctx.beginPath();
-        ctx.arc(Math.random()*1024, Math.random()*1024, Math.random()*40, 0, Math.PI*2);
-        ctx.fill();
+
+    // Parchment Base with "Grit & Age" (Batch 1, Feature 6)
+    ctx.fillStyle = '#f4e4bc'; ctx.fillRect(0, 0, 1024, 1024);
+    for (let i = 0; i < 400; i++) {
+      ctx.fillStyle = `rgba(139, 69, 19, ${Math.random() * 0.08})`;
+      ctx.beginPath(); ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 50, 0, Math.PI * 2); ctx.fill();
     }
-    
-    // Burnt edges
-    const grad1 = ctx.createRadialGradient(512, 512, 200, 512, 512, 750);
-    grad1.addColorStop(0, "rgba(139, 69, 19, 0)");
-    grad1.addColorStop(0.8, "rgba(93, 64, 55, 0.4)");
-    grad1.addColorStop(1, "rgba(62, 39, 35, 0.9)");
-    ctx.fillStyle = grad1;
-    ctx.fillRect(0, 0, 1024, 1024);
-    
-    // Detailed Compass Rose
-    ctx.save();
-    ctx.translate(150, 150);
-    ctx.strokeStyle = "#5d4037"; ctx.lineWidth = 4;
-    ctx.beginPath(); ctx.arc(0, 0, 80, 0, Math.PI * 2); ctx.stroke();
+    // Ink Splats for UX Recruiter WOW
+    for (let i = 0; i < 5; i++) {
+      ctx.fillStyle = "rgba(62, 39, 35, 0.4)";
+      ctx.beginPath(); ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 15 + 5, 0, Math.PI * 2); ctx.fill();
+    }
+
+    // Island Shape
+    ctx.strokeStyle = "#5d4037"; ctx.lineWidth = 15; ctx.beginPath();
+    ctx.moveTo(300, 200);
+    ctx.bezierCurveTo(100, 300, 100, 700, 300, 800); ctx.bezierCurveTo(500, 900, 800, 850, 900, 700);
+    ctx.bezierCurveTo(1000, 500, 800, 200, 600, 150); ctx.bezierCurveTo(400, 100, 350, 150, 300, 200);
+    ctx.stroke(); ctx.fillStyle = "#eec295"; ctx.fill();
+
+    // Interior Details
+    ctx.strokeStyle = "rgba(93, 64, 55, 0.3)"; ctx.lineWidth = 4;
+    for (let i = 0; i < 20; i++) {
+      ctx.beginPath(); ctx.moveTo(Math.random() * 600 + 200, Math.random() * 600 + 200);
+      ctx.lineTo(Math.random() * 600 + 250, Math.random() * 600 + 250); ctx.stroke();
+    }
+
+    // Red X & Compass
+    ctx.strokeStyle = "#b71c1c"; ctx.lineWidth = 15;
+    ctx.beginPath(); ctx.moveTo(710, 710); ctx.lineTo(770, 770); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(770, 710); ctx.lineTo(710, 770); ctx.stroke();
+
+    ctx.save(); ctx.translate(150, 150); ctx.scale(0.8, 0.8);
+    ctx.strokeStyle = "#5d4037"; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(0, 0, 80, 0, Math.PI * 2); ctx.stroke();
     for (let i = 0; i < 8; i++) {
-        ctx.rotate(Math.PI / 4);
-        ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(10, 30); ctx.lineTo(0, 90); ctx.lineTo(-10, 30); ctx.closePath();
-        ctx.fillStyle = i % 2 === 0 ? "#5d4037" : "#b71c1c";
-        ctx.fill();
+      ctx.rotate(Math.PI / 4);
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(10, 30); ctx.lineTo(0, 90); ctx.lineTo(-10, 30); ctx.closePath();
+      ctx.fillStyle = i % 2 === 0 ? "#5d4037" : "#b71c1c"; ctx.fill();
     }
     ctx.restore();
 
     return new THREE.CanvasTexture(c);
   }, []);
 
-  const planeGeo = useMemo(() => {
-    const geo = new THREE.PlaneGeometry(60, 50, 60, 50);
-    const pos = geo.attributes.position;
-    for (let i = 0; i < pos.count; i++) {
-      const x = pos.getX(i);
-      const y = pos.getY(i);
-      // More jagged rough parchment wave
-      const z = Math.sin(x * 0.15) * 0.8 + Math.cos(y * 0.15) * 0.8 + Math.sin(x*y*0.05)*0.2;
-      pos.setZ(i, z);
-    }
-    geo.computeVertexNormals();
-    return geo;
-  }, []);
-
   return (
-    <mesh geometry={planeGeo} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-      <meshLambertMaterial map={canvas} side={THREE.DoubleSide} />
-    </mesh>
+    <group rotation={[-Math.PI / 2, 0, 0]}>
+      {/* Lower Water Layer (Dynamic Shader) */}
+      <mesh position={[0, 0, -0.2]}>
+        <planeGeometry args={[100, 100]} />
+        <shaderMaterial attach="material" args={[WaterShader]} ref={waterRef} transparent />
+      </mesh>
+
+      {/* Upper Parchment Layer (Parallax) */}
+      <mesh ref={parchmentRef} receiveShadow>
+        <planeGeometry args={[80, 80]} />
+        <meshLambertMaterial map={parchmentTex} side={THREE.DoubleSide} transparent />
+      </mesh>
+    </group>
   );
 }
 
 function DashedTrail() {
   const points = MODULES.map(m => new THREE.Vector3(m.pos[0], 0.6, m.pos[2]));
   const curve = new THREE.CatmullRomCurve3(points);
-  const linePoints = curve.getPoints(120);
-  
+  const linePoints = curve.getPoints(200);
+
   return (
     <Line
       points={linePoints}
       color="#8e0000"
-      lineWidth={5}
+      lineWidth={4}
       dashed
-      dashSize={0.6}
-      dashScale={2}
-      gapSize={0.6}
+      dashSize={0.8}
+      gapSize={0.5}
     />
   );
 }
 
 function TreasurePin({ module, active, onClick, isVisited }) {
   const ref = useRef();
-  
+
   useFrame((state) => {
     if (!ref.current) return;
     if (!active && !isVisited) {
-       ref.current.rotation.y = state.clock.elapsedTime * 0.5;
+      ref.current.rotation.y = state.clock.elapsedTime * 0.5;
     }
   });
 
@@ -406,90 +499,200 @@ function TreasurePin({ module, active, onClick, isVisited }) {
         </group>
       )}
 
-      <Html position={[0, 2.5, 0]} center>
-        <motion.div 
-          className={`treasure-marker ${active ? "active" : ""} ${isVisited ? "visited" : ""}`}
-          whileHover={{ scale: 1.2 }}
-        >
-          {module.num}
-        </motion.div>
-      </Html>
+      {!active && (
+        <Html position={[0, 2.5, 0]} center>
+          <motion.div
+            className={`treasure-marker ${isVisited ? "visited" : ""}`}
+            whileHover={{ scale: 1.2 }}
+          >
+            {module.num}
+          </motion.div>
+        </Html>
+      )}
     </group>
   );
 }
 
 function CameraController({ target }) {
+  const lastTarget = useRef(new THREE.Vector3(0, 45, 10));
+
   useFrame((state) => {
-    if (!target) {
-      state.camera.position.lerp(new THREE.Vector3(0, 28, 28), 0.03);
-      state.camera.lookAt(0, 0, 0); 
-      return;
-    }
-    const desired = new THREE.Vector3(target[0], target[1] + 10, target[2] + 12);
-    state.camera.position.lerp(desired, 0.08); 
-    state.camera.lookAt(target[0], target[1], target[2]);
+    const currentTarget = target ? new THREE.Vector3(...target) : new THREE.Vector3(0, 0, 0);
+    const desiredPos = target ?
+      new THREE.Vector3(target[0], target[1] + 12, target[2] + 15) :
+      new THREE.Vector3(0, 50, 20);
+
+    // Feature 12: Cinematic Fly-through
+    state.camera.position.lerp(desiredPos, 0.05);
+    state.camera.lookAt(currentTarget);
   });
   return null;
+}
+
+function NauticalCursor() {
+  const ref = useRef();
+  useFrame((state) => {
+    if (!ref.current) return;
+    const { x, y } = state.mouse;
+    ref.current.position.x = THREE.MathUtils.lerp(ref.current.position.x, x * 20, 0.1);
+    ref.current.position.z = THREE.MathUtils.lerp(ref.current.position.z, -y * 20, 0.1);
+    ref.current.rotation.y = state.clock.elapsedTime * 2.5;
+  });
+  return (
+    <group ref={ref} position={[0, 1.2, 0]}>
+      <mesh rotation={[Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[0.4, 0.5, 32]} />
+        <meshBasicMaterial color="#b71c1c" transparent opacity={0.6} />
+      </mesh>
+      <mesh position={[0, 0, -0.6]} rotation={[Math.PI / 2, 0, 0]}>
+        <coneGeometry args={[0.08, 0.4, 4]} />
+        <meshBasicMaterial color="#b71c1c" />
+      </mesh>
+    </group>
+  );
+}
+
+function Weather() {
+  return (
+    <group>
+      {/* Feature 4: Rainfall/Sparkles */}
+      <Sparkles count={150} scale={45} size={2.5} color="#f4e4bc" opacity={0.3} speed={0.5} />
+      <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
+        <Cloud opacity={0.08} speed={0.4} width={25} depth={1.5} segments={15} position={[0, 10, 0]} />
+      </Float>
+    </group>
+  );
 }
 
 export default function JourneyMap({ onClose }) {
   const [selected, setSelected] = useState(null);
   const [visited, setVisited] = useState(new Set());
+  const [hoveredId, setHoveredId] = useState(null);
+  const [shake, setShake] = useState(false);
 
   const handleSelect = (module) => {
     setSelected(module);
     setVisited(prev => new Set([...prev, module.id]));
+    setShake(true);
+    setTimeout(() => setShake(false), 500);
   };
 
   const selectedModule = MODULES.find(m => m.id === selected?.id);
 
   return (
-    <div className="journey-map-overlay">
+    <div className={`journey-map-overlay ${shake ? 'shake-fx' : ''}`}>
       <div className="journey-map-bg document-style" />
 
-      <Canvas className="journey-map-canvas" shadows camera={{ fov: 50, position: [0, 28, 28] }}>
+      {/* Feature 11: Contextual Mini-Map */}
+      <div className="mini-map-container">
+        <div className="mini-map-island">
+          {MODULES.map(m => (
+            <div key={m.id} className={`mini-map-dot ${visited.has(m.id) ? 'active' : ''}`} style={{ left: `${(m.pos[0] + 40) / 80 * 100}%`, top: `${(m.pos[2] + 40) / 80 * 100}%` }} />
+          ))}
+        </div>
+      </div>
+
+      <Canvas className="journey-map-canvas" shadows camera={{ fov: 45, position: [0, 50, 20] }}>
         <PerspectiveCamera makeDefault />
-        <OrbitControls enablePan={true} maxPolarAngle={Math.PI / 2.2} minDistance={10} maxDistance={40} enableDamping dampingFactor={0.05} />
-        
-        <ambientLight intensity={0.5} color="#fff1e6" />
-        <directionalLight position={[10, 20, 10]} intensity={1.5} color="#ffd8a8" castShadow shadow-mapSize={[1024, 1024]} />
-        <pointLight position={[-10, 10, -10]} intensity={0.8} color="#ffcc80" />
-        <fog attach="fog" args={["#d7ccc8", 20, 70]} />
+        <OrbitControls
+          enablePan={true}
+          maxPolarAngle={Math.PI / 2.2}
+          minDistance={10}
+          maxDistance={70}
+          enableDamping={true}
+          dampingFactor={0.06}
+        />
+
+        <ambientLight intensity={0.5} />
+        <directionalLight
+          position={[10, 30, 20]}
+          intensity={1.5}
+          castShadow
+          shadow-mapSize={[2048, 2048]}
+        />
+
+        {selectedModule && (
+          <pointLight
+            position={[selectedModule.pos[0], 5, selectedModule.pos[2]]}
+            color={selectedModule.color}
+            intensity={5}
+            distance={25}
+          />
+        )}
 
         <Suspense fallback={
           <Html center><div className="map-loading map-ink-title">Unrolling Map...</div></Html>
         }>
           <MapSurface />
           <DashedTrail />
-          
-          <MountainRange position={[12, 0, -12]} />
-          <Desert position={[16, 0, -2]} />
-          <HauntedForest position={[-5, 0, -2]} />
-          <RealisticPirateShip position={[-14, 0, 10]} />
-          <FrightfulFalls />
+          <Weather />
+          <NauticalCursor />
+
+          {/* Feature 3: Grounded Shadows */}
+          <ContactShadows
+            position={[0, -0.05, 0]}
+            opacity={0.4}
+            scale={80}
+            blur={2.4}
+            far={10}
+            color="#3e2723"
+          />
+
+          {/* Main Landmarks - Island Map Icons */}
+          <ScholarIsland position={[-12, 0, 15]} label="Starting Shore" isHovered={hoveredId === 'about'} />
+          <TechRobot position={[-6, 0, 6]} label="Tech Jungle" isHovered={hoveredId === 'stack'} />
+          <RealisticPirateShip position={[-16, 0, -4]} isHovered={hoveredId === 'exp'} />
+          <FrightfulFalls position={[-4, 0, -10]} isHovered={hoveredId === 'projects'} />
+          <TechRobot position={[6, 0, -12]} label="Crystal Caves" isHovered={hoveredId === 'skills'} />
+          <MountainRange position={[16, 0, -5]} isHovered={hoveredId === 'certs'} />
+          <ScholarIsland position={[10, 0, 5]} label="Zen Island" isHovered={hoveredId === 'hobbies'} />
+          <Desert position={[5, 0, 15]} label="Victory Valley" isHovered={hoveredId === 'awards'} />
+          <SnowyPeaks position={[18, 0, 18]} isHovered={hoveredId === 'cont'} />
+          <SecretChest position={[-25, 0, 25]} isHovered={hoveredId === 'secret'} />
 
           <CameraController target={selected?.pos} />
-          
+
           {MODULES.map(module => (
-            <TreasurePin 
-              key={module.id} 
-              module={module} 
-              active={selected?.id === module.id} 
+            <TreasurePin
+              key={module.id}
+              module={module}
+              active={selected?.id === module.id}
               isVisited={visited.has(module.id)}
-              onClick={handleSelect} 
+              onClick={handleSelect}
             />
           ))}
         </Suspense>
+
+        <EffectComposer disableNormalPass>
+          <Bloom luminanceThreshold={0.5} intensity={1.2} radius={0.5} />
+          <Noise opacity={0.08} />
+          <Vignette eskil={false} offset={0.1} darkness={0.9} />
+        </EffectComposer>
       </Canvas>
 
       <div className="journey-nav-top">
-        <motion.div className="journey-title map-ink-text" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-          ☠️ DIVAKAR'S TREASURE MAP
-        </motion.div>
+        <motion.div
+  className="journey-title map-ink-text"
+  initial={{ opacity: 0, y: -40, scale: 0.9 }}
+  animate={{ opacity: 1, y: 0, scale: 1 }}
+  transition={{ duration: 0.8, ease: "easeOut" }}
+>
+  <span className="elite-highlight">'R'</span>
+  <span className="elite-text"> ELITE UNIVERSE</span>
+</motion.div>
         <motion.button className="btn-seal map-wax-seal" onClick={onClose} whileHover={{ scale: 1.15 }} whileTap={{ scale: 0.95 }}>
           <FiX />
         </motion.button>
       </div>
+
+      <AnimatePresence>
+        {selectedModule && (
+          <motion.div className="captains-log-overlay" initial={{ x: -300 }} animate={{ x: 0 }} exit={{ x: -300 }}>
+            <div className="log-stamp">⚓ LOG ENTRY</div>
+            <div className="log-text">"We have arrived at {selectedModule.label}. The air is thick with {selectedModule.id === 'about' ? 'history' : 'innovation'}..."</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="journey-menu-glass map-parchment-menu">
         <div className="menu-header map-ink-title">🧭 MAP LEGEND</div>
@@ -498,7 +701,9 @@ export default function JourneyMap({ onClose }) {
             key={module.id}
             className={`map-legend-item ${selected?.id === module.id ? 'active' : ''} ${visited.has(module.id) ? 'conquered' : ''}`}
             onClick={() => handleSelect(module)}
-            whileHover={{ x: 10 }}
+            onMouseEnter={() => setHoveredId(module.id)}
+            onMouseLeave={() => setHoveredId(null)}
+            whileHover={{ x: 15 }}
           >
             <div className="map-marker-num" style={{ background: visited.has(module.id) ? '#b71c1c' : '#5d4037' }}>{module.num}</div>
             <div className="label-text map-ink-text"><span className="module-icon">{module.icon}</span>{module.label}</div>
@@ -507,15 +712,20 @@ export default function JourneyMap({ onClose }) {
         ))}
       </div>
 
+      {/* Discovery Percentage Banner */}
       <div className="map-progress-banner">
-        ⚜️ Chests Discovered: <strong>{visited.size}/{MODULES.length}</strong>
+        <div className="discovery-label">🗺️ DISCOVERY PROGRESS</div>
+        <div className="discovery-bar-bg">
+          <div className="discovery-bar-fill" style={{ width: `${(visited.size / MODULES.length) * 100}%` }}></div>
+        </div>
+        <div className="discovery-count">{visited.size} / {MODULES.length} CHESTS FOUND</div>
       </div>
 
       {/* --- ANCIENT UNROLLING SCRIPT UI --- */}
       <AnimatePresence>
         {selectedModule && (
           <div className="scroll-unroll-container">
-            <motion.div 
+            <motion.div
               className="ancient-scroll-paper"
               initial={{ scaleX: 0, opacity: 0 }}
               animate={{ scaleX: 1, opacity: 1 }}
@@ -525,12 +735,14 @@ export default function JourneyMap({ onClose }) {
               {/* Left and right wooden rollers */}
               <div className="scroll-roller left" />
               <div className="scroll-roller right" />
-              
+
               <div className="ancient-scroll-inner">
                 <button className="ancient-close-btn" onClick={() => setSelected(null)}>
                   <FiX />
                 </button>
-                {selectedModule.scrollContent}
+                <div className="drop-cap-wrapper">
+                  {selectedModule.scrollContent}
+                </div>
               </div>
             </motion.div>
           </div>

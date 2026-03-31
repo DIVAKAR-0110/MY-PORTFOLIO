@@ -6,18 +6,31 @@ import { Float, Text3D, Sparkles, Billboard, Html } from "@react-three/drei";
 import * as THREE from "three";
 import "./TechStack.css";
 
+import pythonIcon from "../assets/python.png";
+
 const TECH_SHRINE = [
   { name: "React", icon: "⚛️", category: "Frontend", color: "#61DAFB", shrine: 1 },
+  { name: "Angular", icon: "🅰️", category: "Frontend", color: "#DD0031", shrine: 1 },
+
   { name: "Spring Boot", icon: "🔥", category: "Backend", color: "#6DB33F", shrine: 2 },
-  { name: "Django", icon: "🐍", category: "Backend", color: "#092E20", shrine: 2 },
-  { name: "TensorFlow", icon: "🧠", category: "AI", color: "#FF6F00", shrine: 3 },
-  { name: "Python", icon: "🐍", category: "Core", color: "#3776AB", shrine: 1 },
-  { name: "TailwindCSS", icon: "🎨", category: "Frontend", color: "#38BDF8", shrine: 1 },
-  { name: "PostgreSQL", icon: "💎", category: "Database", color: "#4169E1", shrine: 3 },
-  { name: "MongoDB", icon: "📊", category: "Database", color: "#47A248", shrine: 3 },
+  { name: "Django", icon: pythonIcon, category: "Backend", color: "#092E20", shrine: 2 },
   { name: "Node.js", icon: "⚡", category: "Backend", color: "#68A063", shrine: 2 },
+  { name: "Firebase", icon: "🔥", category: "Backend", color: "#FFCA28", shrine: 2 },
+
+  { name: "TensorFlow", icon: "🧠", category: "AI", color: "#FF6F00", shrine: 3 },
+  { name: "Machine Learning", icon: "🤖", category: "AI", color: "#8A2BE2", shrine: 3 },
+
+  { name: "Python", icon: pythonIcon, category: "Core", color: "#3776AB", shrine: 1 },
+  { name: "Java", icon: "☕", category: "Core", color: "#007396", shrine: 1 },
+
+  { name: "TailwindCSS", icon: "🎨", category: "Frontend", color: "#38BDF8", shrine: 1 },
+
+  { name: "PostgreSQL", icon: "💎", category: "Database", color: "#4169E1", shrine: 3 },
+  { name: "MongoDB", icon: "🍃", category: "Database", color: "#47A248", shrine: 3 },
+
   { name: "Three.js", icon: "🌐", category: "3D", color: "#000000", shrine: 1 },
-  { name: "Git", icon: "⚔️", category: "Tools", color: "#F05032", shrine: 4 },
+
+  { name: "GitHub", icon: "⚔️", category: "Tools", color: "#F05032", shrine: 4 },
   { name: "Framer Motion", icon: "✨", category: "Animation", color: "#FF4F92", shrine: 1 }
 ];
 
