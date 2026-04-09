@@ -6,7 +6,7 @@ function About() {
   return (
     <section id="about" className="about-section">
       <div className="section-eyebrow">The Scribe's Tale</div>
-      <h2 className="section-title">An Ancient Soul in a Modern Era</h2>
+      <h2 className="section-title">I enjoy building, learning, and solving real-world problems through code.</h2>
       <div className="section-ornament" />
 
       <div className="about-grid">
