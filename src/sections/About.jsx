@@ -5,13 +5,13 @@ import "./About.css";
 function About() {
   return (
     <section id="about" className="about-section">
-<<<<<<< HEAD
+
       <div className="section-eyebrow" style={{ fontSize: "24px", fontFamily: "IM Fell English" }}>The Scribe's Tale</div>
       <h2 className="section-title">Designing intelligent, scalable systems for real-world impact.</h2>
-=======
+
       <div className="section-eyebrow">The Scribe's Tale</div>
       <h2 className="section-title">I enjoy building, learning, and solving real-world problems through code.</h2>
->>>>>>> a1a9b3efd55a79f59fdfe47e1525af3fdfb657ac
+
       <div className="section-ornament" />
 
       <div className="about-grid">
