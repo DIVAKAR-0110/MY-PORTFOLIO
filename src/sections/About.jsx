@@ -17,8 +17,8 @@ function About() {
 
       <div className="section-eyebrow">The Scribe's Tale</div>
       <h2 className="section-title">
-        "I enjoy building, learning, and solving real-world problems through
-        code."
+        &ldquo;I enjoy building, learning, and solving real-world problems
+        through code.&rdquo;
       </h2>
 
       <div className="section-ornament" />
