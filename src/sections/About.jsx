@@ -15,7 +15,7 @@ function About() {
         Designing intelligent, scalable systems for real-world impact.
       </h2>
 
-      <div className="section-eyebrow">The Scribe's Tale</div>
+      <div className="section-eyebrow">Hi! Everyone...</div>
       <h2 className="section-title">
         &ldquo;I enjoy building, learning, and solving real-world problems
         through code.&rdquo;
