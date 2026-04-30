@@ -9,13 +9,9 @@ function About() {
         className="section-eyebrow"
         style={{ fontSize: "24px", fontFamily: "IM Fell English" }}
       >
-        The Scribe's Tale
+        My Own Tale
       </div>
-      <h2 className="section-title">
-        Designing intelligent, scalable systems for real-world impact.
-      </h2>
 
-      <div className="section-eyebrow">Hi! Everyone...</div>
       <h2 className="section-title">
         &ldquo;I enjoy building, learning, and solving real-world problems
         through code.&rdquo;
@@ -33,7 +29,7 @@ function About() {
           transition={{ duration: 0.6 }}
         >
           <div className="parchment-inner">
-            <h3 className="parchment-title">The Scholar's Journey</h3>
+            <h3 className="parchment-title">My Own Tale</h3>
             <p className="parchment-text">
               I am <span className="parchment-highlight">Divakar R</span>, a
               scholar of

@@ -6,7 +6,7 @@ import { Float, Sparkles, Billboard, Html } from "@react-three/drei";
 import * as THREE from "three";
 import "./TechStack.css";
 
-import pythonIcon from "../assets/python.png";
+import pythonIcon from "../assets/python.jpg";
 import spring from "../assets/springboot.jpg";
 import nodejs from "../assets/node.jpg";
 import django from "../assets/django.jpg";
@@ -107,13 +107,6 @@ const TECH_SHRINE = [
     icon: pga,
     category: "Database",
     color: "#4169E1",
-    shrine: 3,
-  },
-  {
-    name: "MongoDB DB",
-    icon: mongo,
-    category: "Database",
-    color: "#47A248",
     shrine: 3,
   },
 
@@ -231,7 +224,7 @@ function TechStack() {
     <section id="stack" className="tech-shrine-section">
       <div className="shrine-legend">
         <div className="legend-scroll">
-          <h3>🛠️ The Sacred Arsenal</h3>
+          <h3>TECHSTACKS I HAVE WORKED WITH</h3>
 
           <div className="legend-grid">
             {filteredTech.map((tech) => (

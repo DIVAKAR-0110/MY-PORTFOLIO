@@ -106,8 +106,8 @@ function CertCard({ cert, index }) {
 function Certifications() {
   return (
     <section id="certifications" className="certs-section">
-      <div className="section-eyebrow">Honours & Achievements</div>
-      <h2 className="section-title">Hall of Parchments</h2>
+      <div className="section-eyebrow">Hall of Achievements</div>
+      <h2 className="section-title">Honours & Participations</h2>
       <div className="section-ornament" />
       <div className="certs-grid">
         {CERTS.map((cert, i) => (

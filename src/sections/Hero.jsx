@@ -4,12 +4,12 @@ import { FiFileText, FiDownload, FiX } from "react-icons/fi";
 import { useState } from "react";
 import "./Hero.css";
 import AncientGlobe from "../components/AncientGlobe";
-import JourneyMap from "../components/JourneyMap";
+import MyWorld from "../components/MyWorld";
 import AncientCompass from "../components/AncientCompass";
 
 function Hero() {
   const [showResume,  setShowResume]  = useState(false);
-  const [showJourney, setShowJourney] = useState(false);
+  const [showMyWorld, setShowMyWorld] = useState(false);
 
   return (
     <>
@@ -108,7 +108,7 @@ function Hero() {
           transition={{ duration: 0.8, delay: 1.2 }}
         >
           {/* Primary: Journey Map */}
-          <button className="btn-journey" onClick={() => setShowJourney(true)}>
+          <button className="btn-journey" onClick={() => setShowMyWorld(true)}>
             <span className="btn-journey-icon">⚜</span>
             <span>View My Universe</span>
             <span className="btn-journey-icon">⚜</span>
@@ -133,10 +133,10 @@ function Hero() {
         </motion.div>
       </motion.section>
 
-      {/* ── JOURNEY MAP UNIVERSE ── */}
+      {/* ── MY WORLD UNIVERSE ── */}
       <AnimatePresence>
-        {showJourney && (
-          <JourneyMap onClose={() => setShowJourney(false)} />
+        {showMyWorld && (
+          <MyWorld onClose={() => setShowMyWorld(false)} />
         )}
       </AnimatePresence>
 

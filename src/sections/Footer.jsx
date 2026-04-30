@@ -4,12 +4,12 @@ import "./Footer.css";
 import { FiGithub, FiLinkedin, FiMail, FiArrowUp, FiClock } from "react-icons/fi";
 
 const quickLinks = [
-  { id: "hero",     label: "Home"      },
-  { id: "stats",    label: "Chronicles" },
-  { id: "about",    label: "The Scribe" },
-  { id: "stack",    label: "Arsenal"    },
-  { id: "projects", label: "Conquests"  },
-  { id: "contact",  label: "Envoys"     },
+  { id: "hero", label: "Home" },
+  { id: "stats", label: "Chronicles" },
+  { id: "about", label: "The Scribe" },
+  { id: "stack", label: "Arsenal" },
+  { id: "projects", label: "Conquests" },
+  { id: "contact", label: "Envoys" },
 ];
 
 function Footer() {
@@ -37,7 +37,7 @@ function Footer() {
   return (
     <footer className="footer">
       <div className="footer-top-ornament" />
-      
+
       <div className="footer-container container">
         {/* Brand Section */}
         <div className="footer-brand">
@@ -48,7 +48,7 @@ function Footer() {
           <p className="footer-tagline">
             Building the legacies of tomorrow with the wisdom of the ancients.
           </p>
-          
+
           <div className="footer-datetime-box">
             <div className="datetime-glow" />
             <FiClock className="datetime-icon" />
@@ -74,7 +74,7 @@ function Footer() {
               ))}
             </ul>
           </div>
-          
+
           <div className="footer-link-group">
             <h4>The Great Archive</h4>
             <ul>
@@ -94,7 +94,7 @@ function Footer() {
 
       <div className="footer-bottom">
         <div className="container footer-bottom-inner">
-          <p>© {new Date().getFullYear()} &middot; Handcrafted by Divakar R &middot; Ancient Series V2</p>
+          <p>© {new Date().getFullYear()} &middot; Crafted by Divakar R &middot;DR - Portfolio</p>
           <div className="footer-ornament-leaf">❧ ❦ ❧</div>
         </div>
       </div>

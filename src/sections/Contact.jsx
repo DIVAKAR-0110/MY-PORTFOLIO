@@ -111,20 +111,20 @@ function Contact() {
           </div>
 
           <div className="scroll-field">
-            <input name="name" type="text" placeholder=" " value={formData.name} onChange={handleChange} disabled={status === "sending"} />
-            <label>The Envoy's Name</label>
+            <input id="contact-name" name="name" type="text" placeholder=" " autoComplete="name" value={formData.name} onChange={handleChange} disabled={status === "sending"} />
+            <label htmlFor="contact-name">The Envoy's Name</label>
             <div className="line" />
           </div>
 
           <div className="scroll-field">
-            <input name="email" type="email" placeholder=" " value={formData.email} onChange={handleChange} disabled={status === "sending"} />
-            <label>Return Destination (Email)</label>
+            <input id="contact-email" name="email" type="email" placeholder=" " autoComplete="email" value={formData.email} onChange={handleChange} disabled={status === "sending"} />
+            <label htmlFor="contact-email">Return Destination (Email)</label>
             <div className="line" />
           </div>
 
           <div className="scroll-field">
-            <textarea name="message" placeholder=" " value={formData.message} onChange={handleChange} disabled={status === "sending"} />
-            <label>The Message Content</label>
+            <textarea id="contact-message" name="message" placeholder=" " autoComplete="off" value={formData.message} onChange={handleChange} disabled={status === "sending"} />
+            <label htmlFor="contact-message">The Message Content</label>
             <div className="line" />
           </div>
 

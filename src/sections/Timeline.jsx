@@ -55,8 +55,8 @@ const timeline = [
 function Timeline() {
   return (
     <section id="timeline" className="timeline-section">
-      <div className="section-eyebrow">The Chronicle</div>
-      <h2 className="section-title">Timeline of Legacies</h2>
+      <div className="section-eyebrow">My Chronicals</div>
+      <h2 className="section-title">Timeline of Certifications</h2>
       <div className="section-ornament" />
 
       <div className="timeline-journey">
@@ -72,13 +72,13 @@ function Timeline() {
             <div className="manuscript-indicator" style={{ background: item.color }}>
               {item.icon}
             </div>
-            
+
             <div className="manuscript-card">
               <div className="manuscript-header">
                 <span className="manuscript-year">{item.year}</span>
                 <img src={item.logo} alt={item.institution} className="manuscript-logo" />
               </div>
-              
+
               <h3 className="manuscript-title">{item.title}</h3>
               <p className="manuscript-institution">
                 {item.institution}
@@ -86,11 +86,11 @@ function Timeline() {
                   <a href={item.certLink} target="_blank" rel="noreferrer" className="manuscript-cert">📜</a>
                 )}
               </p>
-              
+
               <div className="manuscript-achieve">{item.achievements}</div>
               <p className="manuscript-desc">{item.description}</p>
             </div>
-            
+
             {/* Connecting line for cinematic feel */}
             <div className="manuscript-line" />
           </motion.div>
