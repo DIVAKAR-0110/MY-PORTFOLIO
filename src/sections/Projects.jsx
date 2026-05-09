@@ -11,8 +11,22 @@ import g5 from "../assets/weatherapp.png";
 
 export const projects = [
   {
-    id: "face-analytics",
+    id: "bus-management",
     num: "I",
+    title: "BUS MANAGEMENT SYSTEM",
+    subtitle: "Deep Learning · Computer Vision",
+    description: "Real-time identification with TensorFlow CNN models, OpenCV streams, and Django analytics.",
+    fullDescription: "A sophisticated platform for real-time face identification. Integrates deep learning models with a robust backend for instant verification and historical tracking.",
+    features: ["Real-time verification", "Demographic analytics", "Attendance logging"],
+    stack: ["Python", "TensorFlow", "OpenCV", "Django"],
+    image: g3,
+    color: "#8B3A1E",
+    live: "https://django-project-bus-management-1.onrender.com",
+    stats: { Accuracy: "95%", Latency: "<1s" },
+  },
+  {
+    id: "face-analytics",
+    num: "II",
     title: "AI Face Recognition Realm",
     subtitle: "Deep Learning · Computer Vision",
     description: "Real-time identification with TensorFlow CNN models, OpenCV streams, and Django analytics.",
@@ -25,7 +39,7 @@ export const projects = [
   },
   {
     id: "ssretails",
-    num: "II",
+    num: "III",
     title: "SSRetails — Textile ERP",
     subtitle: "Enterprise · Retail Operations",
     description: "Complete inventory, billing, and supplier management with RBAC for textile commerce.",
@@ -38,7 +52,7 @@ export const projects = [
   },
   {
     id: "complaints",
-    num: "III",
+    num: "IV",
     title: "GovTech Complaint Scroll",
     subtitle: "SaaS · Civic Technology",
     description: "Citizen grievance lifecycle with admin dashboards and automated resolution workflows.",
@@ -51,7 +65,7 @@ export const projects = [
   },
   {
     id: "rbac",
-    num: "IV",
+    num: "V",
     title: "Enterprise RBAC Bastion",
     subtitle: "Security · Zero-Trust",
     description: "Production JWT auth system with Spring Security, policy engine, and role permissions.",
@@ -65,7 +79,7 @@ export const projects = [
   },
   {
     id: "weatherglobe",
-    num: "V",
+    num: "VI",
     title: "WeatherGlobe — 3D Earth Hub",
     subtitle: "A More Engaging Way to Learn in 3D",
     description: "Reimagining geography education through cinematic 3D visuals and live weather experiences.",
