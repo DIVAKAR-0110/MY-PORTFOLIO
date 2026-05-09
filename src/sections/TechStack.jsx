@@ -1,241 +1,118 @@
 // src/sections/TechStack.jsx
-import React, { useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Float, Sparkles, Billboard, Html } from "@react-three/drei";
-import * as THREE from "three";
+import React from "react";
+import { motion } from "framer-motion";
+import { FiTerminal, FiLayers, FiDatabase, FiCloud, FiCpu, FiCode, FiArrowRight } from "react-icons/fi";
 import "./TechStack.css";
 
-import pythonIcon from "../assets/python.jpg";
-import spring from "../assets/springboot.jpg";
-import nodejs from "../assets/node.jpg";
-import django from "../assets/django.jpg";
-import git from "../assets/git.jpg";
-import tensor from "../assets/tensorflow.jpg";
-import tail from "../assets/tailwindcss.jpg";
-import pga from "../assets/postgresql.png";
-import mongo from "../assets/mongodb.jpg";
-import mysql from "../assets/mysql.png";
-import aws from "../assets/aws.png";
-
-const TECH_SHRINE = [
-  {
-    name: "React",
-    icon: "⚛️",
-    category: "Frontend",
-    color: "#61DAFB",
-    shrine: 1,
-  },
-  {
-    name: "Angular",
-    icon: "🅰️",
-    category: "Frontend",
-    color: "#DD0031",
-    shrine: 1,
-  },
-
-  {
-    name: "Spring Boot",
-    icon: spring,
-    category: "Backend",
-    color: "#6DB33F",
-    shrine: 2,
-  },
-  {
-    name: "Django",
-    icon: django,
-    category: "Backend",
-    color: "#092E20",
-    shrine: 2,
-  },
-  {
-    name: "Node.js",
-    icon: nodejs,
-    category: "Backend",
-    color: "#68A063",
-    shrine: 2,
-  },
-  {
-    name: "Firebase",
-    icon: "🔥",
-    category: "Backend",
-    color: "#FFCA28",
-    shrine: 2,
-  },
-
-  {
-    name: "TensorFlow",
-    icon: tensor,
-    category: "AI",
-    color: "#FF6F00",
-    shrine: 3,
-  },
-  {
-    name: "Machine Learning",
-    icon: "🤖",
-    category: "AI",
-    color: "#8A2BE2",
-    shrine: 3,
-  },
-
-  {
-    name: "Python",
-    icon: pythonIcon,
-    category: "Core",
-    color: "#3776AB",
-    shrine: 1,
-  },
-  {
-    name: "MongoDB",
-    icon: mongo,
-    category: "Core",
-    color: "#47A248",
-    shrine: 1,
-  },
-  { name: "MySQL", icon: mysql, category: "Core", color: "#5d838f", shrine: 1 },
-
-  {
-    name: "TailwindCSS",
-    icon: tail,
-    category: "Frontend",
-    color: "#38BDF8",
-    shrine: 1,
-  },
-
-  {
-    name: "PostgreSQL",
-    icon: pga,
-    category: "Database",
-    color: "#4169E1",
-    shrine: 3,
-  },
-
-  { name: "AWS", icon: aws, category: "Cloud", color: "#000000", shrine: 1 },
-
-  { name: "GitHub", icon: git, category: "Tools", color: "#F05032", shrine: 4 },
-  {
-    name: "Framer Motion",
-    icon: "✨",
-    category: "Animation",
-    color: "#FF4F92",
-    shrine: 1,
-  },
+const TECH_STATIONS = [
+  { name: "C", icon: <FiTerminal />, color: "#A8B9CC", yOffset: 120 },
+  { name: "C++", icon: <FiTerminal />, color: "#00599C", yOffset: 80 },
+  { name: "Python", icon: <FiTerminal />, color: "#3776AB", yOffset: 40 },
+  { name: "HTML+CSS", icon: <FiLayers />, color: "#E34F26", yOffset: 20 },
+  { name: "JAVA", icon: <FiCode />, color: "#007396", yOffset: 40 },
+  { name: "Django", icon: <FiLayers />, color: "#092E20", yOffset: 100 },
+  { name: "PostgreSQL", icon: <FiDatabase />, color: "#336791", yOffset: 180 },
+  { name: "MySQL", icon: <FiDatabase />, color: "#4479A1", yOffset: 240 },
+  { name: "ML", icon: <FiCpu />, color: "#9C27B0", yOffset: 260 },
+  { name: "React", icon: <FiLayers />, color: "#61DAFB", yOffset: 240 },
+  { name: "Angular", icon: <FiLayers />, color: "#DD0031", yOffset: 180 },
+  { name: "AWS", icon: <FiCloud />, color: "#FF9900", yOffset: 100 },
+  { name: "MongoDB", icon: <FiDatabase />, color: "#47A248", yOffset: 40 },
+  { name: "SpringBoot", icon: <FiLayers />, color: "#6DB33F", yOffset: 20 },
 ];
-
-const CATEGORIES = [
-  "All",
-  "Frontend",
-  "Backend",
-  "AI",
-  "Database",
-  "Core",
-  "Tools",
-  "Cloud",
-  "Animation",
-];
-
-// ✅ Reusable icon renderer (FIX)
-const RenderIcon = ({ icon, name }) => {
-  const isEmoji = typeof icon === "string" && icon.length <= 3;
-
-  return isEmoji ? (
-    <span>{icon}</span>
-  ) : (
-    <img src={icon} alt={name} className="tech-img" />
-  );
-};
-
-function MysticParticleAura() {
-  return Array.from({ length: 100 }, (_, i) => (
-    <Sparkles
-      key={i}
-      count={2}
-      size={0.15}
-      position={[
-        (Math.random() - 0.5) * 30,
-        Math.random() * 15,
-        (Math.random() - 0.5) * 30,
-      ]}
-      speed={0.8}
-      color="#FFD700"
-    />
-  ));
-}
-
-function TechRelic({ tech, isActive, onClick }) {
-  const groupRef = useRef();
-  const time = useRef(0);
-
-  useFrame(() => {
-    time.current += 0.02;
-    if (groupRef.current) {
-      groupRef.current.rotation.y += 0.01;
-      groupRef.current.position.y =
-        Math.sin(time.current * 2 + tech.shrine) * 0.1;
-    }
-  });
-
-  return (
-    <Float speed={1.5} rotationIntensity={0.5} floatIntensity={0.8}>
-      <group ref={groupRef} onClick={onClick} scale={isActive ? 1.4 : 1}>
-        <mesh>
-          <dodecahedronGeometry args={[1.2, 0]} />
-          <meshStandardMaterial
-            color={tech.color}
-            emissive={tech.color}
-            emissiveIntensity={isActive ? 0.9 : 0.4}
-            metalness={0.8}
-            roughness={0.2}
-          />
-        </mesh>
-
-        <mesh rotation={[Math.PI / 2, 0, 0]}>
-          <torusGeometry args={[1.6, 0.06, 8, 64]} />
-          <meshBasicMaterial
-            color="#FFD700"
-            transparent
-            opacity={isActive ? 0.9 : 0.5}
-          />
-        </mesh>
-
-        <Billboard position={[0, 0, 1.4]}>
-          <Html center transform distanceFactor={5}>
-            <div className="tech-relic-display" style={{ color: tech.color }}>
-              <div className="relic-icon">
-                <RenderIcon icon={tech.icon} name={tech.name} />
-              </div>
-              <div className="relic-name">{tech.name}</div>
-            </div>
-          </Html>
-        </Billboard>
-      </group>
-    </Float>
-  );
-}
 
 function TechStack() {
-  const [activeFilter, setActiveFilter] = useState("All");
-
-  const filteredTech = TECH_SHRINE.filter(
-    (tech) => activeFilter === "All" || tech.category === activeFilter,
-  );
-
   return (
-    <section id="stack" className="tech-shrine-section">
-      <div className="shrine-legend">
-        <div className="legend-scroll">
-          <h3>TECHSTACKS I HAVE WORKED WITH</h3>
+    <section id="stack" className="infinite-erp-roadmap">
+      <div className="erp-roadmap-header">
+        <div className="erp-indicator">
+          <span className="erp-pulse" />
+          <span className="erp-label">LIVE_ROADMAP_FEED</span>
+        </div>
+        <h2 className="erp-roadmap-title">Technical <span>Evolution</span></h2>
+        <div className="erp-scroll-hint">Scroll Horizontal →</div>
+      </div>
 
-          <div className="legend-grid">
-            {filteredTech.map((tech) => (
-              <div key={tech.name} className="legend-item">
-                <div className="legend-icon" style={{ background: tech.color }}>
-                  <RenderIcon icon={tech.icon} name={tech.name} />
-                </div>
-                <span>{tech.name}</span>
+      <div className="infinite-road-canvas">
+        <div className="road-scroll-wrapper">
+          {/* The Infinite Road SVG */}
+          <svg className="infinite-road-svg" viewBox="0 0 2500 300" preserveAspectRatio="none">
+            {/* Dark Tech Base */}
+            <path
+              d="M0 150 C 200 150, 300 50, 500 50 C 700 50, 800 250, 1000 250 C 1200 250, 1300 50, 1500 50 C 1700 50, 1800 250, 2000 250 C 2200 250, 2300 150, 2500 150"
+              fill="none"
+              stroke="#111"
+              strokeWidth="60"
+            />
+            {/* Glowing Neon Line */}
+            <motion.path
+              initial={{ pathLength: 0 }}
+              whileInView={{ pathLength: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 5, ease: "linear" }}
+              d="M0 150 C 200 150, 300 50, 500 50 C 700 50, 800 250, 1000 250 C 1200 250, 1300 50, 1500 50 C 1700 50, 1800 250, 2000 250 C 2200 250, 2300 150, 2500 150"
+              fill="none"
+              stroke="#ffd700"
+              strokeWidth="2"
+              className="road-neon-center"
+            />
+          </svg>
+
+          {/* Stations mapped to the road curve */}
+          <div className="curved-stations">
+            {TECH_STATIONS.map((tech, index) => {
+              const leftPos = (index / (TECH_STATIONS.length)) * 2500;
+              
+              return (
+                <motion.div 
+                  key={tech.name}
+                  className="curved-node"
+                  style={{ 
+                    left: `${leftPos}px`,
+                    top: `${tech.yOffset}px`,
+                    "--node-color": tech.color
+                  }}
+                  initial={{ opacity: 0, scale: 0 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.15 }}
+                >
+                  <div className="node-glow-ring" />
+                  <motion.div 
+                    className="node-box"
+                    whileHover={{ y: -10, boxShadow: `0 0 25px ${tech.color}` }}
+                  >
+                    <span className="node-icon">{tech.icon}</span>
+                    <span className="node-name">{tech.name}</span>
+                  </motion.div>
+                </motion.div>
+              );
+            })}
+
+            {/* "To Be Continued" Finale */}
+            <motion.div 
+              className="curved-node finale"
+              style={{ left: "2350px", top: "150px" }}
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+            >
+              <div className="finale-card">
+                <div className="finale-glow" />
+                <span className="finale-text">Exploring Next...</span>
+                <FiArrowRight className="finale-arrow" />
               </div>
-            ))}
+            </motion.div>
           </div>
+        </div>
+      </div>
+
+      <div className="erp-roadmap-decor">
+        <div className="grid-line horizontal" />
+        <div className="grid-line vertical" />
+        <div className="decor-system-stats">
+          <span>PATH_STABILITY: 99.8%</span>
+          <span>STATION_SYNC: ACTIVE</span>
         </div>
       </div>
     </section>

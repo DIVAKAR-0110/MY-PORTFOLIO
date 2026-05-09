@@ -31,7 +31,19 @@ const projects = [
     live: "",
     stats: { buses: "25", routes: "12", users: "500+" },
   },
-  // Add other projects here...
+  {
+    id: "weatherglobe",
+    title: "WeatherGlobe — 3D Earth Hub",
+    subtitle: "Interactive 3D · Educational Platform",
+    description: "Cinematic 3D globe application combining live weather visualization with gamified geography learning.",
+    highlights: ["3D Earth Visualization", "GeoQuiz Pro", "Real-time Weather"],
+    stack: ["Angular 20", "Three.js", "Globe.gl"],
+    image: "/src/assets/weatherapp.png",
+    gradient: "from-blue-900 to-black",
+    github: "https://github.com/DIVAKAR-0110/WEATHER-GLOBE",
+    live: "https://weather-globe-gamma.vercel.app/",
+    stats: { Accuracy: "Live", Engine: "Three.js" },
+  },
 ];
 
 export default projects;

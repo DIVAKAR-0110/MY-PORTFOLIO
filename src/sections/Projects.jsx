@@ -7,6 +7,7 @@ import g1 from "../assets/SSRETAILS.png";
 import g2 from "../assets/image2.png";
 import g3 from "../assets/image3.png";
 import g4 from "../assets/imga.png";
+import g5 from "../assets/weatherapp.png";
 
 export const projects = [
   {
@@ -60,6 +61,34 @@ export const projects = [
     image: g4,
     color: "#7A3020",
     stats: { Uptime: "99.9%", Safety: "High" },
+    github: "https://github.com/DIVAKAR-0110",
+  },
+  {
+    id: "weatherglobe",
+    num: "V",
+    title: "WeatherGlobe — 3D Earth Hub",
+    subtitle: "A More Engaging Way to Learn in 3D",
+    description: "Reimagining geography education through cinematic 3D visuals and live weather experiences.",
+    fullDescription: "WeatherGlobe brings geography to life through a cinematic 3D Earth powered by Angular 20 and Three.js. Students can explore live weather, experience dynamic day and night transitions, and learn through interactive modes like GeoQuiz Pro and Discovery Mode. Built for young learners in Grades 2–4, the platform combines playful exploration with smooth animations and modern glassmorphism visuals.",
+    features: [
+      "Interactive real-time 3D Earth visualization",
+      "Dynamic day and night transitions",
+      "GeoQuiz Pro geography learning system",
+      "Discovery Mode for guided exploration"
+    ],
+
+    stack: [
+      "Angular 20",
+      "Three.js",
+      "Globe.gl",
+      "Angular Signals",
+      "Server-Side Rendering (SSR)"
+    ],
+    image: g5,
+    color: "#1a365d",
+    stats: { Accuracy: "Live", Engine: "Three.js" },
+    github: "https://github.com/DIVAKAR-0110/WEATHER-GLOBE",
+    live: "https://dr-weather-globe.netlify.app/",
   },
 ];
 
@@ -93,7 +122,7 @@ const ManuscriptCard = ({ project, onClick }) => {
           <FiLayers size={14} />
         </div>
       </div>
-      
+
       <div className="manuscript-proj-image">
         <img src={project.image} alt={project.title} />
         <div className="manuscript-proj-overlay" />
@@ -164,7 +193,7 @@ function Projects() {
                 <div className="proj-modal-main">
                   <h3 className="modal-section-h">Chronicle Narrative</h3>
                   <p className="modal-p">{project.fullDescription}</p>
-                  
+
                   <h3 className="modal-section-h">Featured Artifacts</h3>
                   <ul className="modal-u">
                     {project.features.map((f, i) => (
@@ -191,9 +220,14 @@ function Projects() {
                   </div>
 
                   <div className="sidebar-actions">
-                    <a href="https://github.com/DIVAKAR-0110" target="_blank" rel="noreferrer" className="modal-action-btn">
-                      <FiGithub /> Source Scroll
+                    <a href={project.github || "https://github.com/DIVAKAR-0110"} target="_blank" rel="noreferrer" className="modal-action-btn">
+                      <FiGithub /> View Source Code
                     </a>
+                    {project.live && (
+                      <a href={project.live} target="_blank" rel="noreferrer" className="modal-action-btn">
+                        <FiExternalLink /> Go Live
+                      </a>
+                    )}
                   </div>
                 </div>
               </div>
