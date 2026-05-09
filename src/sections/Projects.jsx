@@ -21,8 +21,9 @@ export const projects = [
     stack: ["Python", "TensorFlow", "OpenCV", "Django"],
     image: g3,
     color: "#8B3A1E",
-    live: "https://django-project-bus-management-1.onrender.com",
     stats: { Accuracy: "95%", Latency: "<1s" },
+    github: "https://github.com/DIVAKAR-0110/DJANGO-PROJECT-BUS-MANAGEMENT",
+    live: "https://django-project-bus-management-1.onrender.com",
   },
   {
     id: "face-analytics",
