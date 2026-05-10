@@ -6,7 +6,7 @@ import { FiGithub, FiExternalLink, FiArrowRight, FiX, FiLayers, FiZap } from "re
 import g1 from "../assets/SSRETAILS.png";
 import g2 from "../assets/image2.png";
 import g3 from "../assets/busproj.png";
-import g4 from "../assets/imga.png";
+import g4 from "../assets/image3.png";
 import g5 from "../assets/weatherapp.png";
 
 export const projects = [
@@ -34,7 +34,7 @@ export const projects = [
     fullDescription: "A sophisticated platform for real-time face identification. Integrates deep learning models with a robust backend for instant verification and historical tracking.",
     features: ["Real-time verification", "Demographic analytics", "Attendance logging"],
     stack: ["Python", "TensorFlow", "OpenCV", "Django"],
-    image: g3,
+    image: g4,
     color: "#8B3A1E",
     stats: { Accuracy: "95%", Latency: "<1s" },
   },
