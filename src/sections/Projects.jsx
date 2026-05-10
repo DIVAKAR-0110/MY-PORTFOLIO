@@ -5,15 +5,15 @@ import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-mo
 import { FiGithub, FiExternalLink, FiArrowRight, FiX, FiLayers, FiZap } from "react-icons/fi";
 import g1 from "../assets/SSRETAILS.png";
 import g2 from "../assets/image2.png";
-import g3 from "../assets/image3.png";
+import g3 from "../assets/busproj.png";
 import g4 from "../assets/imga.png";
 import g5 from "../assets/weatherapp.png";
 
 export const projects = [
   {
-    id: "bus-management",
+    id: "asdf",
     num: "I",
-    title: "BUS MANAGEMENT SYSTEM",
+    title: "asdf",
     subtitle: "Deep Learning · Computer Vision",
     description: "Real-time identification with TensorFlow CNN models, OpenCV streams, and Django analytics.",
     fullDescription: "A sophisticated platform for real-time face identification. Integrates deep learning models with a robust backend for instant verification and historical tracking.",
@@ -65,18 +65,24 @@ export const projects = [
     stats: { Reports: "50+", Status: "Live" },
   },
   {
-    id: "rbac",
+    id: "cit-bus-portal",
     num: "V",
-    title: "Enterprise RBAC Bastion",
-    subtitle: "Security · Zero-Trust",
-    description: "Production JWT auth system with Spring Security, policy engine, and role permissions.",
-    fullDescription: "A secure authentication service for enterprise microservices. Implements Zero-Trust principles for centralized identity management.",
-    features: ["Stateless JWT", "Granular policies", "Audit logging"],
-    stack: ["Spring Boot", "JWT", "MySQL"],
-    image: g4,
-    color: "#7A3020",
-    stats: { Uptime: "99.9%", Safety: "High" },
-    github: "https://github.com/DIVAKAR-0110",
+    title: "CIT Bus Portal — Smart Bus Management",
+    subtitle: "Django · Transport Operations",
+    description: "A smart campus bus management system with live tracking, route scheduling, and student-driver dashboards built on Django.",
+    fullDescription: "CIT Bus Portal is a full-stack Smart Bus Management System built for CIT Coimbatore. It streamlines campus transport with role-based dashboards for students, drivers, and admins. Features include route scheduling, live GPS-based bus tracking, automated notifications, and comprehensive analytics — all wrapped in a clean, responsive UI.",
+    features: [
+      "Role-based dashboards for Students, Drivers & Admins",
+      "Real-time GPS bus tracking & route management",
+      "Automated notifications and schedule alerts",
+      "Responsive UI with analytics dashboards",
+    ],
+    stack: ["Django", "Python", "MySQL", "Bootstrap", "REST APIs"],
+    image: g3,
+    color: "#1a4a7a",
+    stats: { Status: "Live", Users: "500+" },
+    github: "https://github.com/DIVAKAR-0110/DJANGO-PROJECT-BUS-MANAGEMENT",
+    live: "https://django-project-bus-management-1.onrender.com/",
   },
   {
     id: "weatherglobe",
