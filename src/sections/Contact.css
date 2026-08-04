@@ -1,4 +1,6 @@
-/* Contact.css */
+/* Contact.css — Premium Parchment & Modern Intel Typography */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Outfit:wght@400;500;600;700&family=IM+Fell+English:ital@0;1&family=Share+Tech+Mono&display=swap');
+
 .contact-grid {
   display: grid;
   grid-template-columns: 0.9fr 1.1fr;
@@ -11,11 +13,11 @@
   .contact-grid { grid-template-columns: 1fr; gap: 2rem; }
 }
 
-/* LEFT: Lore Box */
+/* ── LEFT: Lore Box ───────────────────────────────────────────────────────── */
 .contact-lore-box {
   background: var(--bg-card);
   border: 1.5px solid var(--border);
-  border-radius: 4px;
+  border-radius: 6px;
   padding: 2rem;
   box-shadow: var(--shadow-md);
   display: flex;
@@ -30,7 +32,7 @@
 }
 
 .lore-orb {
-  width: 50px; height: 50px;
+  width: 44px; height: 44px;
   border-radius: 50%;
   border: 3px solid var(--accent);
   background: radial-gradient(circle, var(--accent) 0%, transparent 80%);
@@ -46,6 +48,7 @@
   font-family: 'Cinzel', serif;
   font-size: 0.8rem;
   font-weight: 700;
+  letter-spacing: 0.1em;
   color: var(--text-muted);
   display: flex; align-items: center; gap: 0.5rem;
 }
@@ -90,11 +93,12 @@
   font-family: 'Cinzel', serif;
   font-size: 0.95rem; color: var(--text);
   margin-bottom: 0.75rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem;
+  letter-spacing: 0.08em;
 }
 
 .lore-email {
   display: flex; align-items: center; gap: 0.75rem;
-  font-family: 'Lora', serif; font-size: 0.95rem; color: var(--text-muted);
+  font-family: 'Outfit', sans-serif; font-size: 0.95rem; color: var(--text-muted);
   margin-bottom: 1rem;
 }
 .lore-icon { color: var(--accent); }
@@ -110,10 +114,11 @@
   background: var(--accent-glow); color: var(--text); border-color: var(--accent);
 }
 
-/* RIGHT: Manuscript Form */
+/* ── RIGHT: Manuscript Form ───────────────────────────────────────────────── */
 .contact-manuscript-form {
   background: var(--bg-card);
-  border: 1px solid var(--border);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
   padding: 2.5rem 2rem;
   display: flex; flex-direction: column; gap: 1.5rem;
   position: relative;
@@ -121,72 +126,308 @@
 }
 
 .form-legend h3 {
-  font-family: 'Cinzel Decorative', serif; font-size: 1.35rem; color: var(--text);
-  margin-bottom: 0.25rem;
+  font-family: 'Cinzel', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.3rem;
+  letter-spacing: 0.05em;
 }
 .form-legend p {
-  font-family: 'IM Fell English', serif; font-size: 0.95rem; color: var(--text-faint);
-  font-style: italic; margin-bottom: 1rem;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
 }
 
-.scroll-field { position: relative; width: 100%; }
-.scroll-field input, .scroll-field textarea {
-  width: 100%; padding: 0.8rem 0;
-  background: none; border: none;
-  font-family: 'IM Fell English', serif; font-size: 1.1rem; color: var(--text);
+/* ── LOCATION BANNER ───────────────────────────────────────────────────────── */
+.loc-banner {
+  border-radius: 6px;
+  padding: 0.85rem 1rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+
+.loc-banner--granted {
+  background: rgba(74, 222, 128, 0.08);
+  border: 1px solid rgba(74, 222, 128, 0.4);
+  box-shadow: 0 0 16px rgba(74, 222, 128, 0.1);
+}
+
+.loc-banner--denied {
+  background: rgba(248, 113, 113, 0.08);
+  border: 1px solid rgba(248, 113, 113, 0.4);
+  box-shadow: 0 0 16px rgba(248, 113, 113, 0.1);
+}
+
+.loc-banner--prompt {
+  background: rgba(200, 146, 42, 0.08);
+  border: 1px solid rgba(200, 146, 42, 0.3);
+}
+
+.loc-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.loc-banner-content.flex-col {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.loc-banner-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.loc-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+.loc-icon.green { color: #4ade80; }
+.loc-icon.red   { color: #f87171; }
+.loc-icon.amber { color: var(--accent); }
+
+.spinning-slow {
+  animation: spin 3s linear infinite;
+}
+
+.loc-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.loc-text strong {
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.loc-banner--granted .loc-text strong { color: #4ade80; }
+.loc-banner--denied  .loc-text strong { color: #f87171; }
+.loc-banner--prompt  .loc-text strong { color: var(--accent); }
+
+.loc-text span {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* Action buttons inside location banner */
+.loc-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.loc-retry-btn, .loc-help-btn {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s;
+}
+
+.loc-retry-btn {
+  background: rgba(248, 113, 113, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(248, 113, 113, 0.4);
+}
+.loc-retry-btn:hover {
+  background: rgba(248, 113, 113, 0.3);
+  transform: translateY(-1px);
+}
+
+.loc-help-btn {
+  background: rgba(200, 146, 42, 0.1);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+.loc-help-btn:hover {
+  background: rgba(200, 146, 42, 0.2);
+  color: var(--text);
+}
+
+/* ── STEP BY STEP UNBLOCK HELP CARD ────────────────────────────────────── */
+.loc-help-card {
+  background: rgba(15, 10, 6, 0.95);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  overflow: hidden;
+}
+
+.loc-help-card h4 {
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #f87171;
+  margin-bottom: 0.6rem;
+  letter-spacing: 0.05em;
+}
+
+.loc-help-card ol {
+  padding-left: 1.2rem;
+  margin: 0;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.loc-help-card code {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--accent);
+  background: rgba(200, 146, 42, 0.1);
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+}
+
+.inline-refresh-link {
+  background: var(--accent);
+  color: #1a0e08;
+  border: none;
+  border-radius: 3px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  cursor: pointer;
+  margin-left: 0.3rem;
+}
+.inline-refresh-link:hover { opacity: 0.85; }
+
+/* ── FORM FIELDS ───────────────────────────────────────────────────────────── */
+.scroll-field {
+  position: relative;
+  width: 100%;
+}
+
+.scroll-field input,
+.scroll-field textarea {
+  width: 100%;
+  padding: 0.8rem 0 0.4rem 0;
+  background: none;
+  border: none;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--text);
   border-bottom: 1.5px solid var(--border);
   transition: border-color 0.3s;
 }
+
 .scroll-field label {
-  position: absolute; left: 0; top: 0.8rem;
-  font-family: 'Cinzel', serif; font-size: 0.85rem; color: var(--text-faint);
-  pointer-events: none; transition: all 0.3s;
+  position: absolute;
+  left: 0;
+  top: 0.8rem;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-faint);
+  pointer-events: none;
+  transition: all 0.3s ease;
 }
-.scroll-field input:focus ~ label, .scroll-field input:not(:placeholder-shown) ~ label,
-.scroll-field textarea:focus ~ label, .scroll-field textarea:not(:placeholder-shown) ~ label {
-  top: -1.2rem; font-size: 0.7rem; color: var(--accent);
+
+.scroll-field input:focus ~ label,
+.scroll-field input:not(:placeholder-shown) ~ label,
+.scroll-field textarea:focus ~ label,
+.scroll-field textarea:not(:placeholder-shown) ~ label {
+  top: -1.2rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.05em;
 }
+
 .scroll-field .line {
-  position: absolute; bottom: 0; left: 50%; right: 50%;
-  height: 2px; background: var(--accent); transition: all 0.3s;
+  position: absolute;
+  bottom: 0; left: 50%; right: 50%;
+  height: 2px;
+  background: var(--accent);
+  transition: all 0.3s;
 }
-.scroll-field input:focus ~ .line, .scroll-field textarea:focus ~ .line {
+
+.scroll-field input:focus ~ .line,
+.scroll-field textarea:focus ~ .line {
   left: 0; right: 0;
 }
 
-/* Character counter beneath textarea */
+/* Character counter */
 .char-counter {
   display: block;
   text-align: right;
-  font-family: 'Cinzel', serif;
-  font-size: 0.68rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.72rem;
   letter-spacing: 0.05em;
   color: var(--text-faint);
   margin-top: 0.3rem;
   transition: color 0.3s;
 }
 
+/* Submit Button */
 .scroll-submit-btn {
-  margin-top: 1rem;
+  margin-top: 0.5rem;
   padding: 1rem;
   background: linear-gradient(135deg, var(--accent-dark), #6B4226);
   color: #F9EDD5;
-  font-family: 'Cinzel', serif; font-size: 0.9rem; font-weight: 700;
-  border: none; border-radius: 3px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center; gap: 0.75rem;
-  box-shadow: var(--shadow-md); transition: all 0.3s;
-}
-.scroll-submit-btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
-.scroll-submit-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
+  font-family: 'Cinzel', serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s;
 }
 
-.scroll-alert {
-  padding: 0.75rem; border-radius: 4px;
-  font-family: 'IM Fell English', serif; font-size: 0.9rem;
-  display: flex; align-items: center; gap: 0.6rem;
+.scroll-submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
 }
-.scroll-alert.error { background: rgba(139, 58, 30, 0.1); color: #8B3A1E; border: 1px solid #8B3A1E; }
-.scroll-alert.success { background: rgba(46, 88, 32, 0.1); color: #2E5820; border: 1px solid #2E5820; }
+
+.scroll-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Alerts */
+.scroll-alert {
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.scroll-alert.error {
+  background: rgba(248, 113, 113, 0.1);
+  color: #f87171;
+  border: 1px solid rgba(248, 113, 113, 0.4);
+}
+.scroll-alert.success {
+  background: rgba(74, 222, 128, 0.1);
+  color: #4ade80;
+  border: 1px solid rgba(74, 222, 128, 0.4);
+}

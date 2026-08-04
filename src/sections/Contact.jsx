@@ -1,27 +1,29 @@
 // src/sections/Contact.jsx
 import "./Contact.css";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiGithub, FiLinkedin, FiMail, FiSend, FiAlertCircle, FiFeather } from "react-icons/fi";
+import {
+  FiGithub, FiLinkedin, FiMail, FiSend,
+  FiAlertCircle, FiFeather, FiCheckCircle,
+  FiLock, FiCompass, FiRefreshCw, FiInfo, FiMapPin
+} from "react-icons/fi";
 import { useState, useEffect, useRef } from "react";
 
 const DISPLAY_EMAIL = atob("cmRpdmFrYXIwMTEwQGdtYWlsLmNvbQ==");
-
-/** RFC-5322-ish email format — mirrors server-side check */
-const EMAIL_REGEX = /^[^\s@]{1,64}@[^\s@]{1,255}\.[^\s@]{2,}$/;
-
-const COOLDOWN_SECONDS = 60; // prevent rapid re-submissions
-const MSG_MAX = 3000;
+const EMAIL_REGEX   = /^[^\s@]{1,64}@[^\s@]{1,255}\.[^\s@]{2,}$/;
+const COOLDOWN_SECONDS = 60;
+const MSG_MAX  = 3000;
 const NAME_MAX = 100;
 
 function Contact() {
-  const [formData, setFormData]       = useState({ name: "", email: "", message: "" });
-  const [honeypot, setHoneypot]       = useState("");          // invisible to real users
-  const [gpsData,  setGpsData]        = useState(null);        // HTML5 Device GPS coordinates
+  const [formData, setFormData]           = useState({ name: "", email: "", message: "" });
+  const [honeypot, setHoneypot]           = useState("");
+  const [gpsData,  setGpsData]            = useState(null);
   const [locationState, setLocationState] = useState("prompt"); // "prompt" | "granted" | "denied"
-  const [status,   setStatus]         = useState("idle");      // idle | sending | success | error
-  const [errorMSG, setErrorMSG]       = useState("");
-  const [typedText, setTypedText]     = useState("");
-  const [cooldown,  setCooldown]      = useState(0);           // seconds remaining
+  const [showHelp, setShowHelp]           = useState(false);
+  const [status,   setStatus]             = useState("idle");      // idle | sending | success | error
+  const [errorMSG, setErrorMSG]           = useState("");
+  const [typedText, setTypedText]         = useState("");
+  const [cooldown,  setCooldown]          = useState(0);
   const cooldownRef = useRef(null);
 
   // ── Capture Device GPS (HTML5 Geolocation) ──────────────────────────────────
@@ -30,6 +32,7 @@ function Contact() {
       setLocationState("denied");
       return;
     }
+    setLocationState("prompt");
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setGpsData({
@@ -38,6 +41,8 @@ function Contact() {
           accuracy: Math.round(pos.coords.accuracy),
         });
         setLocationState("granted");
+        setShowHelp(false);
+        setErrorMSG("");
       },
       (err) => {
         console.log("GPS prompt declined or unavailable:", err.message);
@@ -54,7 +59,7 @@ function Contact() {
   // ── Typing terminal effect ──────────────────────────────────────────────────
   useEffect(() => {
     let msg = "";
-    if (status === "idle")    msg = "Awakening the Labyrinth... \nCipher verified. \nReady to scribe your dispatch.";
+    if (status === "idle")         msg = "Awakening the Labyrinth... \nCipher verified. \nReady to scribe your dispatch.";
     else if (status === "sending") msg = "Sealing the scroll... \nDispatching messenger birds to the Citadel... \nCross-referencing historical archives...";
     else if (status === "success") msg = "Dispatch received! \nDivakar's Chronicles have been updated. \nExpect a reply through the carrier network.";
     else if (status === "error")   msg = `FALLBACK PROTOCOL: Carrier lost. \nDirect your scroll via ${DISPLAY_EMAIL}.`;
@@ -71,7 +76,7 @@ function Contact() {
   const startCooldown = () => {
     setCooldown(COOLDOWN_SECONDS);
     cooldownRef.current = setInterval(() => {
-      setCooldown(prev => {
+      setCooldown((prev) => {
         if (prev <= 1) { clearInterval(cooldownRef.current); return 0; }
         return prev - 1;
       });
@@ -80,26 +85,22 @@ function Contact() {
 
   useEffect(() => () => clearInterval(cooldownRef.current), []);
 
-  // ── Field change handler ─────────────────────────────────────────────────────
   const handleChange = (e) => {
-    requestGPS();
+    if (locationState === "denied") requestGPS();
     setFormData({ ...formData, [e.target.name]: e.target.value });
     if (errorMSG) setErrorMSG("");
   };
 
-  // ── Submit ───────────────────────────────────────────────────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault();
-    requestGPS();
 
-    // Mandatory location check
     if (locationState !== "granted" || !gpsData) {
-      setErrorMSG("🔒 Location verification is required to dispatch your scroll. Please allow location access in your browser site settings.");
+      setErrorMSG("🔒 Location verification required. Enable location access in browser settings to dispatch.");
+      setShowHelp(true);
       requestGPS();
       return;
     }
 
-    // Client-side guards (mirrors server-side checks)
     if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
       setErrorMSG("Alas! Every parchment field must be inscribed.");
       return;
@@ -164,7 +165,12 @@ function Contact() {
           viewport={{ once: true }}
         >
           <div className="lore-orb-header">
-            <div className="lore-orb" style={{ borderColor: status === "success" ? "#2E5820" : status === "error" ? "#8B3A1E" : "var(--accent)" }} />
+            <div
+              className="lore-orb"
+              style={{
+                borderColor: status === "success" ? "#2E5820" : status === "error" ? "#8B3A1E" : "var(--accent)"
+              }}
+            />
             <div className="lore-status">
               <FiFeather /> {status.toUpperCase()}
             </div>
@@ -203,67 +209,87 @@ function Contact() {
         >
           <div className="form-legend">
             <h3>Dispatch Your Scroll 📜</h3>
-            <p>Your message shall be carried to the inner vault.</p>
+            <p>Your message shall be carried securely to the inner vault.</p>
           </div>
 
           {/* ── Location Verification Status Banner ── */}
-          <div
-            style={{
-              padding: "0.6rem 0.85rem",
-              borderRadius: "4px",
-              fontSize: "0.78rem",
-              fontFamily: "'Cinzel', serif",
-              letterSpacing: "0.04em",
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              transition: "all 0.3s",
-              border: locationState === "granted"
-                ? "1px solid rgba(46, 88, 32, 0.5)"
-                : locationState === "denied"
-                ? "1px solid rgba(139, 58, 30, 0.5)"
-                : "1px solid rgba(200, 146, 42, 0.4)",
-              background: locationState === "granted"
-                ? "rgba(46, 88, 32, 0.12)"
-                : locationState === "denied"
-                ? "rgba(139, 58, 30, 0.12)"
-                : "rgba(200, 146, 42, 0.08)",
-              color: locationState === "granted"
-                ? "#4ade80"
-                : locationState === "denied"
-                ? "#f87171"
-                : "#C8922A",
-            }}
-          >
+          <div className={`loc-banner loc-banner--${locationState}`}>
             {locationState === "granted" && (
-              <>🎯 LOCATION VERIFIED · Exact Building Pin Ready (±{gpsData?.accuracy || 0}m)</>
+              <div className="loc-banner-content">
+                <FiCheckCircle className="loc-icon green" />
+                <div className="loc-text">
+                  <strong>LOCATION VERIFIED</strong>
+                  <span>Exact Building Pin Attached (±{gpsData?.accuracy || 0}m precision)</span>
+                </div>
+              </div>
             )}
+
             {locationState === "denied" && (
-              <>
-                🔒 LOCATION REQUIRED · Permission Blocked.{" "}
-                <button
-                  type="button"
-                  onClick={requestGPS}
-                  style={{
-                    background: "none",
-                    border: "underline",
-                    color: "#f87171",
-                    cursor: "pointer",
-                    fontFamily: "inherit",
-                    fontWeight: "bold",
-                    marginLeft: "0.3rem"
-                  }}
-                >
-                  Click to Retry
-                </button>
-              </>
+              <div className="loc-banner-content flex-col">
+                <div className="loc-banner-row">
+                  <FiLock className="loc-icon red" />
+                  <div className="loc-text">
+                    <strong>LOCATION REQUIRED TO DISPATCH</strong>
+                    <span>Browser permission was blocked. Allow location to unlock.</span>
+                  </div>
+                </div>
+                <div className="loc-actions">
+                  <button
+                    type="button"
+                    className="loc-retry-btn"
+                    onClick={() => { requestGPS(); setShowHelp((h) => !h); }}
+                  >
+                    <FiRefreshCw size={12} /> Retry / Fix Location
+                  </button>
+                  <button
+                    type="button"
+                    className="loc-help-btn"
+                    onClick={() => setShowHelp((h) => !h)}
+                  >
+                    <FiInfo size={12} /> How to unblock?
+                  </button>
+                </div>
+              </div>
             )}
+
             {locationState === "prompt" && (
-              <>🛰️ REQUESTING LOCATION · Please allow browser prompt to enable dispatching.</>
+              <div className="loc-banner-content">
+                <FiCompass className="loc-icon amber spinning-slow" />
+                <div className="loc-text">
+                  <strong>LOCATION VERIFICATION PENDING</strong>
+                  <span>Click <strong>'Allow'</strong> in your browser prompt to enable dispatching.</span>
+                </div>
+              </div>
             )}
           </div>
 
-          {/* ── Honeypot — hidden from real users, traps bots ── */}
+          {/* ── Step-by-Step Unblock Helper Card ── */}
+          <AnimatePresence>
+            {showHelp && locationState === "denied" && (
+              <motion.div
+                className="loc-help-card"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+              >
+                <h4>🔒 How to Allow Location in 2 Simple Steps:</h4>
+                <ol>
+                  <li>
+                    Click the <strong>🔒 Padlock / Site Settings icon</strong> next to the URL in your browser address bar:
+                    <br /><code>divakar-dev-portfolio.netlify.app</code>
+                  </li>
+                  <li>
+                    Change <strong>Location</strong> setting from <em>Block</em> to <strong>Allow</strong>.
+                  </li>
+                  <li>
+                    Click <button type="button" className="inline-refresh-link" onClick={() => window.location.reload()}>Refresh Page</button> to unlock the form!
+                  </li>
+                </ol>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* ── Honeypot (bot trap) ── */}
           <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", overflow: "hidden" }}>
             <label htmlFor="contact-trap">Leave this empty</label>
             <input
@@ -277,6 +303,7 @@ function Contact() {
             />
           </div>
 
+          {/* Name Field */}
           <div className="scroll-field">
             <input
               id="contact-name"
@@ -293,6 +320,7 @@ function Contact() {
             <div className="line" />
           </div>
 
+          {/* Email Field */}
           <div className="scroll-field">
             <input
               id="contact-email"
@@ -308,6 +336,7 @@ function Contact() {
             <div className="line" />
           </div>
 
+          {/* Message Field */}
           <div className="scroll-field">
             <textarea
               id="contact-message"
@@ -321,15 +350,15 @@ function Contact() {
             />
             <label htmlFor="contact-message">The Message Content</label>
             <div className="line" />
-            {/* Character counter */}
             <span
               className="char-counter"
-              style={{ color: charsLeft < 100 ? "var(--accent-dark)" : "var(--text-faint)" }}
+              style={{ color: charsLeft < 100 ? "#f87171" : "var(--text-faint)" }}
             >
               {charsLeft} / {MSG_MAX}
             </span>
           </div>
 
+          {/* Submit Button */}
           <button
             type="submit"
             className="scroll-submit-btn"
@@ -341,6 +370,8 @@ function Contact() {
               ? cooldown > 0
                 ? `RECEIVED · Wait ${cooldown}s`
                 : "RECEIVED"
+              : locationState !== "granted"
+              ? "🔒 ALLOW LOCATION TO SEND"
               : cooldown > 0
               ? `WAIT ${cooldown}s`
               : "SEND DISPATCH"}
