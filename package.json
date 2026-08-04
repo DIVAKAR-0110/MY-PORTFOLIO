@@ -18,6 +18,7 @@
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "firebase-admin": "^14.2.0",
     "framer-motion": "^12.34.3",
     "glsl-noise": "^0.0.0",
     "motion": "^12.34.3",

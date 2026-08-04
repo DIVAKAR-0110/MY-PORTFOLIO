@@ -11,23 +11,8 @@ import g5 from "../assets/weatherapp.png";
 
 export const projects = [
   {
-    id: "asdf",
-    num: "I",
-    title: "asdf",
-    subtitle: "Deep Learning · Computer Vision",
-    description: "Real-time identification with TensorFlow CNN models, OpenCV streams, and Django analytics.",
-    fullDescription: "A sophisticated platform for real-time face identification. Integrates deep learning models with a robust backend for instant verification and historical tracking.",
-    features: ["Real-time verification", "Demographic analytics", "Attendance logging"],
-    stack: ["Python", "TensorFlow", "OpenCV", "Django"],
-    image: g3,
-    color: "#8B3A1E",
-    stats: { Accuracy: "95%", Latency: "<1s" },
-    github: "https://github.com/DIVAKAR-0110/DJANGO-PROJECT-BUS-MANAGEMENT",
-    live: "https://django-project-bus-management-1.onrender.com",
-  },
-  {
     id: "face-analytics",
-    num: "II",
+    num: "I",
     title: "AI Face Recognition Realm",
     subtitle: "Deep Learning · Computer Vision",
     description: "Real-time identification with TensorFlow CNN models, OpenCV streams, and Django analytics.",
@@ -40,7 +25,7 @@ export const projects = [
   },
   {
     id: "ssretails",
-    num: "III",
+    num: "II",
     title: "SSRetails — Textile ERP",
     subtitle: "Enterprise · Retail Operations",
     description: "Complete inventory, billing, and supplier management with RBAC for textile commerce.",
@@ -53,7 +38,7 @@ export const projects = [
   },
   {
     id: "complaints",
-    num: "IV",
+    num: "III",
     title: "GovTech Complaint Scroll",
     subtitle: "SaaS · Civic Technology",
     description: "Citizen grievance lifecycle with admin dashboards and automated resolution workflows.",
@@ -66,7 +51,7 @@ export const projects = [
   },
   {
     id: "cit-bus-portal",
-    num: "V",
+    num: "IV",
     title: "CIT Bus Portal — Smart Bus Management",
     subtitle: "Django · Transport Operations",
     description: "A smart campus bus management system with live tracking, route scheduling, and student-driver dashboards built on Django.",
@@ -86,7 +71,7 @@ export const projects = [
   },
   {
     id: "weatherglobe",
-    num: "VI",
+    num: "V",
     title: "WeatherGlobe — 3D Earth Hub",
     subtitle: "A More Engaging Way to Learn in 3D",
     description: "Reimagining geography education through cinematic 3D visuals and live weather experiences.",

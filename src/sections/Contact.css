@@ -154,6 +154,18 @@
   left: 0; right: 0;
 }
 
+/* Character counter beneath textarea */
+.char-counter {
+  display: block;
+  text-align: right;
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+  margin-top: 0.3rem;
+  transition: color 0.3s;
+}
+
 .scroll-submit-btn {
   margin-top: 1rem;
   padding: 1rem;
@@ -164,7 +176,12 @@
   display: flex; align-items: center; justify-content: center; gap: 0.75rem;
   box-shadow: var(--shadow-md); transition: all 0.3s;
 }
-.scroll-submit-btn:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+.scroll-submit-btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+.scroll-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
 
 .scroll-alert {
   padding: 0.75rem; border-radius: 4px;

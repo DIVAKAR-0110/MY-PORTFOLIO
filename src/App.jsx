@@ -1,5 +1,5 @@
 // src/App.jsx
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, Suspense, lazy } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ThemeProvider } from "./context/ThemeContext";
@@ -16,6 +16,9 @@ import About from "./sections/About";
 import Contact from "./sections/Contact";
 import Footer from "./sections/Footer";
 import "./App.css";
+
+// ─── LAZY ROUTES ───
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 
 // ─── LOADING SCREEN COMPONENT ───
 const LoadingScreen = ({ onFinish }) => {
@@ -138,6 +141,15 @@ function App() {
             <Router>
               <Routes>
                 <Route path="/" element={<MainLayout />} />
+                <Route
+                  path="/admin"
+                  element={
+                    <Suspense fallback={<div style={{ minHeight: "100vh", background: "#0A0604", display: "flex", alignItems: "center", justifyContent: "center", color: "#C8922A", fontFamily: "Cinzel, serif", letterSpacing: "0.2em" }}>⚔ LOADING VAULT...</div>}
+                  >
+                    <AdminDashboard />
+                  </Suspense>
+                }
+              />
               </Routes>
             </Router>
           </motion.div>

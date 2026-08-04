@@ -1,23 +1,34 @@
 // src/sections/Contact.jsx
 import "./Contact.css";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiGithub, FiLinkedin, FiMail, FiSend, FiCheckCircle, FiAlertCircle, FiFeather, FiBookOpen } from "react-icons/fi";
-import { useState, useEffect } from "react";
+import { FiGithub, FiLinkedin, FiMail, FiSend, FiAlertCircle, FiFeather } from "react-icons/fi";
+import { useState, useEffect, useRef } from "react";
 
 const DISPLAY_EMAIL = atob("cmRpdmFrYXIwMTEwQGdtYWlsLmNvbQ==");
 
-function Contact() {
-  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
-  const [status, setStatus] = useState("idle"); // idle | sending | success | error
-  const [errorMSG, setErrorMSG] = useState("");
-  const [typedText, setTypedText] = useState("");
+/** RFC-5322-ish email format — mirrors server-side check */
+const EMAIL_REGEX = /^[^\s@]{1,64}@[^\s@]{1,255}\.[^\s@]{2,}$/;
 
+const COOLDOWN_SECONDS = 60; // prevent rapid re-submissions
+const MSG_MAX = 3000;
+const NAME_MAX = 100;
+
+function Contact() {
+  const [formData, setFormData]   = useState({ name: "", email: "", message: "" });
+  const [honeypot, setHoneypot]   = useState("");          // invisible to real users
+  const [status,   setStatus]     = useState("idle");      // idle | sending | success | error
+  const [errorMSG, setErrorMSG]   = useState("");
+  const [typedText, setTypedText] = useState("");
+  const [cooldown,  setCooldown]  = useState(0);           // seconds remaining
+  const cooldownRef = useRef(null);
+
+  // ── Typing terminal effect ──────────────────────────────────────────────────
   useEffect(() => {
     let msg = "";
-    if (status === "idle") msg = "Awakening the Labyrinth... \nCipher verified. \nReady to scribe your dispatch.";
+    if (status === "idle")    msg = "Awakening the Labyrinth... \nCipher verified. \nReady to scribe your dispatch.";
     else if (status === "sending") msg = "Sealing the scroll... \nDispatching messenger birds to the Citadel... \nCross-referencing historical archives...";
     else if (status === "success") msg = "Dispatch received! \nDivakar's Chronicles have been updated. \nExpect a reply through the carrier network.";
-    else if (status === "error") msg = `FALLBACK PROTOCOL: Carrier lost. \nDirect your scroll via ${DISPLAY_EMAIL}.`;
+    else if (status === "error")   msg = `FALLBACK PROTOCOL: Carrier lost. \nDirect your scroll via ${DISPLAY_EMAIL}.`;
 
     let i = 0;
     const interval = setInterval(() => {
@@ -27,37 +38,83 @@ function Contact() {
     return () => clearInterval(interval);
   }, [status]);
 
+  // ── Cooldown timer ───────────────────────────────────────────────────────────
+  const startCooldown = () => {
+    setCooldown(COOLDOWN_SECONDS);
+    cooldownRef.current = setInterval(() => {
+      setCooldown(prev => {
+        if (prev <= 1) { clearInterval(cooldownRef.current); return 0; }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  useEffect(() => () => clearInterval(cooldownRef.current), []);
+
+  // ── Field change handler ─────────────────────────────────────────────────────
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     if (errorMSG) setErrorMSG("");
   };
 
+  // ── Submit ───────────────────────────────────────────────────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Client-side guards (mirrors server-side checks)
     if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
       setErrorMSG("Alas! Every parchment field must be inscribed.");
       return;
     }
+    if (formData.name.trim().length > NAME_MAX) {
+      setErrorMSG(`Name must be ${NAME_MAX} characters or fewer.`);
+      return;
+    }
+    if (!EMAIL_REGEX.test(formData.email.trim())) {
+      setErrorMSG("That doesn't look like a valid email address.");
+      return;
+    }
+    if (formData.message.trim().length > MSG_MAX) {
+      setErrorMSG(`Message must be ${MSG_MAX} characters or fewer.`);
+      return;
+    }
+    if (cooldown > 0) {
+      setErrorMSG(`Please wait ${cooldown}s before sending another dispatch.`);
+      return;
+    }
+
     setStatus("sending");
+    setErrorMSG("");
+
     try {
       const resp = await fetch("/.netlify/functions/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, honeypot }),
       });
-      if (!resp.ok) throw new Error("The scroll was rejected by the oracle.");
+
+      const data = await resp.json().catch(() => ({}));
+
+      if (!resp.ok) {
+        throw new Error(data.error || "The scroll was rejected by the oracle.");
+      }
+
       setStatus("success");
       setFormData({ name: "", email: "", message: "" });
+      startCooldown();
     } catch (err) {
       setErrorMSG(err.message);
       setStatus("error");
     }
   };
 
+  const charsLeft = MSG_MAX - formData.message.length;
+  const isSubmitDisabled = status === "sending" || cooldown > 0;
+
   return (
     <section id="contact" className="contact">
       <div className="section-eyebrow">Dispatch a Scroll</div>
-      <h2 className="section-title">Envoys & Messages</h2>
+      <h2 className="section-title">Envoys &amp; Messages</h2>
       <div className="section-ornament" />
 
       <div className="contact-grid">
@@ -69,7 +126,7 @@ function Contact() {
           viewport={{ once: true }}
         >
           <div className="lore-orb-header">
-            <div className="lore-orb" style={{ borderColor: status === 'success' ? '#2E5820' : status === 'error' ? '#8B3A1E' : 'var(--accent)' }} />
+            <div className="lore-orb" style={{ borderColor: status === "success" ? "#2E5820" : status === "error" ? "#8B3A1E" : "var(--accent)" }} />
             <div className="lore-status">
               <FiFeather /> {status.toUpperCase()}
             </div>
@@ -80,7 +137,7 @@ function Contact() {
               <span className="dot" /><span className="dot" /><span className="dot" />
             </div>
             <div className="scroll-content">
-              {typedText.split('\n').map((line, j) => <p key={j}>{line}</p>)}
+              {typedText.split("\n").map((line, j) => <p key={j}>{line}</p>)}
               <span className="quill-cursor"></span>
             </div>
           </div>
@@ -104,37 +161,108 @@ function Contact() {
           initial={{ opacity: 0, x: 40 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
+          noValidate
         >
           <div className="form-legend">
             <h3>Dispatch Your Scroll 📜</h3>
             <p>Your message shall be carried to the inner vault.</p>
           </div>
 
+          {/* ── Honeypot — hidden from real users, traps bots ── */}
+          <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", overflow: "hidden" }}>
+            <label htmlFor="contact-trap">Leave this empty</label>
+            <input
+              id="contact-trap"
+              name="honeypot"
+              type="text"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              tabIndex={-1}
+              autoComplete="off"
+            />
+          </div>
+
           <div className="scroll-field">
-            <input id="contact-name" name="name" type="text" placeholder=" " autoComplete="name" value={formData.name} onChange={handleChange} disabled={status === "sending"} />
+            <input
+              id="contact-name"
+              name="name"
+              type="text"
+              placeholder=" "
+              autoComplete="name"
+              maxLength={NAME_MAX}
+              value={formData.name}
+              onChange={handleChange}
+              disabled={isSubmitDisabled}
+            />
             <label htmlFor="contact-name">The Envoy's Name</label>
             <div className="line" />
           </div>
 
           <div className="scroll-field">
-            <input id="contact-email" name="email" type="email" placeholder=" " autoComplete="email" value={formData.email} onChange={handleChange} disabled={status === "sending"} />
+            <input
+              id="contact-email"
+              name="email"
+              type="email"
+              placeholder=" "
+              autoComplete="email"
+              value={formData.email}
+              onChange={handleChange}
+              disabled={isSubmitDisabled}
+            />
             <label htmlFor="contact-email">Return Destination (Email)</label>
             <div className="line" />
           </div>
 
           <div className="scroll-field">
-            <textarea id="contact-message" name="message" placeholder=" " autoComplete="off" value={formData.message} onChange={handleChange} disabled={status === "sending"} />
+            <textarea
+              id="contact-message"
+              name="message"
+              placeholder=" "
+              autoComplete="off"
+              maxLength={MSG_MAX}
+              value={formData.message}
+              onChange={handleChange}
+              disabled={isSubmitDisabled}
+            />
             <label htmlFor="contact-message">The Message Content</label>
             <div className="line" />
+            {/* Character counter */}
+            <span
+              className="char-counter"
+              style={{ color: charsLeft < 100 ? "var(--accent-dark)" : "var(--text-faint)" }}
+            >
+              {charsLeft} / {MSG_MAX}
+            </span>
           </div>
 
-          <button type="submit" className="scroll-submit-btn" disabled={status === "sending"}>
-            {status === "sending" ? "DISPATCHING..." : status === "success" ? "RECEIVED" : "SEND DISPATCH"}
-            {status === "idle" && <FiSend />}
+          <button
+            type="submit"
+            className="scroll-submit-btn"
+            disabled={isSubmitDisabled}
+          >
+            {status === "sending"
+              ? "DISPATCHING..."
+              : status === "success"
+              ? cooldown > 0
+                ? `RECEIVED · Wait ${cooldown}s`
+                : "RECEIVED"
+              : cooldown > 0
+              ? `WAIT ${cooldown}s`
+              : "SEND DISPATCH"}
+            {!isSubmitDisabled && status === "idle" && <FiSend />}
           </button>
 
           <AnimatePresence>
-            {errorMSG && <motion.div className="scroll-alert error" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}><FiAlertCircle /> {errorMSG}</motion.div>}
+            {errorMSG && (
+              <motion.div
+                className="scroll-alert error"
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+              >
+                <FiAlertCircle /> {errorMSG}
+              </motion.div>
+            )}
           </AnimatePresence>
         </motion.form>
       </div>

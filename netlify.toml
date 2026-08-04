@@ -1,6 +1,8 @@
-# Global configuration to disable the secrets scanner during the build
-# This allows the public email address to be displayed in the UI even though 
-# it matches a backend environment variable.
-
+# Global configuration
 [build.environment]
   SECRETS_SCAN_ENABLED = "false"
+
+# Tell Netlify to use esbuild to bundle firebase-admin properly
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["firebase-admin"]

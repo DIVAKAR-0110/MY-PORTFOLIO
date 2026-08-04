@@ -55,7 +55,7 @@ const timeline = [
 function Timeline() {
   return (
     <section id="timeline" className="timeline-section">
-      <div className="section-eyebrow">My Chronicals</div>
+      <div className="section-eyebrow">My Chronicles</div>
       <h2 className="section-title">Timeline of Certifications</h2>
       <div className="section-ornament" />
 
