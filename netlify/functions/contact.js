@@ -89,22 +89,24 @@ async function getGeo(ip) {
 }
 
 // ── Firestore Logger ──────────────────────────────────────────────────────────
-async function logToFirestore({ ip, name, email, message, userAgent, status, honeypotValue }) {
+async function logToFirestore({ ip, name, email, message, userAgent, status, honeypotValue, gpsData }) {
   try {
-    if (!process.env.FIREBASE_PROJECT_ID) return; // Skip if Firebase not configured
+    if (!process.env.FIREBASE_PROJECT_ID && !process.env.FIREBASE_SERVICE_ACCOUNT_JSON) return;
 
     const db     = getDB();
-    // Firestore doc keys can't contain dots — use underscores
     const ipKey  = (ip || "unknown").replace(/[.:]/g, "_");
     const ipRef  = db.collection("ip_summary").doc(ipKey);
     const ipSnap = await ipRef.get();
 
-    // Reuse cached geo if this IP has been seen before, else fetch
     const geo = ipSnap.exists && ipSnap.data().geo?.country
       ? ipSnap.data().geo
       : await getGeo(ip);
 
     const timestamp = new Date().toISOString();
+
+    const exactGps = gpsData && typeof gpsData.lat === "number" && typeof gpsData.lon === "number"
+      ? { lat: gpsData.lat, lon: gpsData.lon, accuracy: gpsData.accuracy || 0, source: "DEVICE_GPS" }
+      : null;
 
     const logEntry = {
       timestamp,
@@ -115,49 +117,44 @@ async function logToFirestore({ ip, name, email, message, userAgent, status, hon
       userAgent:     userAgent     || "",
       status,
       honeypotValue: honeypotValue || "",
-      flagged:       false,          // top-level — easier to query than nested geo.flagged
+      flagged:       false,
       geo,
+      exactGps,
     };
 
     const batch = db.batch();
 
-    // 1. New log entry (auto-id)
     batch.set(db.collection("contact_logs").doc(), logEntry);
 
-    // 2. Upsert ip_summary
+    const ipDataUpdate = {
+      lastSeen:         timestamp,
+      totalSubmissions: FieldValue.increment(1),
+      successCount:     FieldValue.increment(status === "SUCCESS" ? 1 : 0),
+      blockedCount:     FieldValue.increment(status !== "SUCCESS" ? 1 : 0),
+      lastEmail:        email || "",
+      lastName:         name  || "",
+    };
+    if (exactGps) ipDataUpdate.lastExactGps = exactGps;
+
     if (!ipSnap.exists) {
       batch.set(ipRef, {
-        firstSeen:        timestamp,
-        lastSeen:         timestamp,
-        totalSubmissions: 1,
-        successCount:     status === "SUCCESS" ? 1 : 0,
-        blockedCount:     status !== "SUCCESS" ? 1 : 0,
-        flagged:          false,
-        lastEmail:        email || "",
-        lastName:         name  || "",
+        firstSeen: timestamp,
+        flagged:   false,
         geo,
+        ...ipDataUpdate,
       });
     } else {
-      batch.update(ipRef, {
-        lastSeen:         timestamp,
-        totalSubmissions: FieldValue.increment(1),
-        successCount:     FieldValue.increment(status === "SUCCESS" ? 1 : 0),
-        blockedCount:     FieldValue.increment(status !== "SUCCESS" ? 1 : 0),
-        lastEmail:        email || "",
-        lastName:         name  || "",
-      });
+      batch.update(ipRef, ipDataUpdate);
     }
 
     await batch.commit();
   } catch (err) {
-    // Firestore failure must NEVER break email delivery
     console.error("Firestore log error:", err.message);
   }
 }
 
 // ── Netlify Handler ───────────────────────────────────────────────────────────
 export const handler = async (event) => {
-  // Extract metadata from every request (used by the logger)
   const ip = (
     event.headers["x-forwarded-for"] ||
     event.headers["client-ip"] ||
@@ -166,14 +163,12 @@ export const handler = async (event) => {
 
   const userAgent = event.headers["user-agent"] || "";
 
-  // ── 1. Only POST ────────────────────────────────────────────────────────────
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: JSON.stringify({ error: "Method Not Allowed" }) };
   }
 
-  // ── 2. Parse body ───────────────────────────────────────────────────────────
   if (!event.body) {
-    await logToFirestore({ ip, name: "", email: "", message: "", userAgent, status: "INVALID", honeypotValue: "" });
+    await logToFirestore({ ip, name: "", email: "", message: "", userAgent, status: "INVALID", honeypotValue: "", gpsData: null });
     return { statusCode: 400, body: JSON.stringify({ error: "Invalid request: Missing body." }) };
   }
 
@@ -181,54 +176,46 @@ export const handler = async (event) => {
   try {
     body = JSON.parse(event.body);
   } catch {
-    await logToFirestore({ ip, name: "", email: "", message: "", userAgent, status: "INVALID", honeypotValue: "" });
+    await logToFirestore({ ip, name: "", email: "", message: "", userAgent, status: "INVALID", honeypotValue: "", gpsData: null });
     return { statusCode: 400, body: JSON.stringify({ error: "Invalid request: Body is not valid JSON." }) };
   }
 
-  const { name, email, message, honeypot } = body;
+  const { name, email, message, honeypot, gpsData } = body;
 
-  // ── 3. Honeypot — bots fill hidden fields, real users never do ──────────────
   if (honeypot) {
     console.warn(`Honeypot triggered — IP: ${ip}`);
-    await logToFirestore({ ip, name: name || "", email: email || "", message: message || "", userAgent, status: "BOT_BLOCKED", honeypotValue: honeypot });
-    // Return fake 200 so bots think they succeeded
+    await logToFirestore({ ip, name: name || "", email: email || "", message: message || "", userAgent, status: "BOT_BLOCKED", honeypotValue: honeypot, gpsData });
     return { statusCode: 200, body: JSON.stringify({ success: true, message: "Message sent successfully." }) };
   }
 
-  // ── 4. Required field presence ──────────────────────────────────────────────
   if (!name || !email || !message) {
-    await logToFirestore({ ip, name: name || "", email: email || "", message: message || "", userAgent, status: "INVALID", honeypotValue: "" });
+    await logToFirestore({ ip, name: name || "", email: email || "", message: message || "", userAgent, status: "INVALID", honeypotValue: "", gpsData });
     return { statusCode: 400, body: JSON.stringify({ error: "All fields are required (name, email, message)." }) };
   }
 
-  // ── 5. Input length limits ──────────────────────────────────────────────────
   if (name.trim().length > 100) {
-    await logToFirestore({ ip, name: name.trim(), email, message, userAgent, status: "INVALID", honeypotValue: "" });
+    await logToFirestore({ ip, name: name.trim(), email, message, userAgent, status: "INVALID", honeypotValue: "", gpsData });
     return { statusCode: 400, body: JSON.stringify({ error: "Name must be 100 characters or fewer." }) };
   }
   if (message.trim().length > 3000) {
-    await logToFirestore({ ip, name: name.trim(), email, message: message.trim(), userAgent, status: "INVALID", honeypotValue: "" });
+    await logToFirestore({ ip, name: name.trim(), email, message: message.trim(), userAgent, status: "INVALID", honeypotValue: "", gpsData });
     return { statusCode: 400, body: JSON.stringify({ error: "Message must be 3000 characters or fewer." }) };
   }
 
-  // ── 6. Email format validation ──────────────────────────────────────────────
   if (!EMAIL_REGEX.test(email.trim())) {
-    await logToFirestore({ ip, name: name.trim(), email: email.trim(), message: message.trim(), userAgent, status: "INVALID", honeypotValue: "" });
+    await logToFirestore({ ip, name: name.trim(), email: email.trim(), message: message.trim(), userAgent, status: "INVALID", honeypotValue: "", gpsData });
     return { statusCode: 400, body: JSON.stringify({ error: "Please enter a valid email address." }) };
   }
 
-  // ── 7. Server credentials check ─────────────────────────────────────────────
   if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
     console.error("Missing Gmail environment variables!");
     return { statusCode: 500, body: JSON.stringify({ error: "Server configuration error. Please try again later." }) };
   }
 
-  // ── 8. Sanitise inputs ──────────────────────────────────────────────────────
   const safeName    = escapeHtml(name.trim());
   const safeEmail   = escapeHtml(email.trim());
   const safeMessage = escapeHtml(message.trim());
 
-  // ── 9. Send email ───────────────────────────────────────────────────────────
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -237,12 +224,16 @@ export const handler = async (event) => {
     },
   });
 
+  const gpsInfoText = gpsData && gpsData.lat && gpsData.lon
+    ? `Device GPS Pin: https://maps.google.com?q=${gpsData.lat},${gpsData.lon} (Accuracy: ±${gpsData.accuracy || 0}m)`
+    : "Device GPS: Denied/Not available";
+
   const mailOptions = {
     from:    `Portfolio Contact <${process.env.GMAIL_USER}>`,
     to:      process.env.GMAIL_USER,
     replyTo: email.trim(),
     subject: `New Portfolio Message from ${safeName}`,
-    text:    `New message from your portfolio.\n\nName: ${name.trim()}\nEmail: ${email.trim()}\nIP: ${ip}\n\nMessage:\n${message.trim()}`,
+    text:    `New message from your portfolio.\n\nName: ${name.trim()}\nEmail: ${email.trim()}\nIP: ${ip}\n${gpsInfoText}\n\nMessage:\n${message.trim()}`,
     html: `
       <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
         <div style="background-color: #2C1810; padding: 20px; text-align: center;">
@@ -253,6 +244,7 @@ export const handler = async (event) => {
           <p><strong>Name:</strong> ${safeName}</p>
           <p><strong>Email:</strong> <a href="mailto:${safeEmail}" style="color: #C8922A;">${safeEmail}</a></p>
           <p><strong>IP Address:</strong> <code>${ip}</code></p>
+          ${gpsData && gpsData.lat && gpsData.lon ? `<p><strong>🎯 Exact Device GPS Pin:</strong> <a href="https://maps.google.com?q=${gpsData.lat},${gpsData.lon}" target="_blank" style="color: #4ade80; font-weight: bold;">View Physical Location (±${gpsData.accuracy || 0}m)</a></p>` : ''}
           <h3 style="color: #2C1810; border-top: 1px solid #e2e8f0; padding-top: 15px; margin-top: 20px;">Message</h3>
           <div style="background-color: #F5E6C8; padding: 15px; border-radius: 6px; border-left: 4px solid #C8922A;">
             <p style="margin: 0; white-space: pre-wrap;">${safeMessage}</p>
@@ -267,15 +259,14 @@ export const handler = async (event) => {
 
   try {
     await transporter.sendMail(mailOptions);
-    // Log success AFTER the email is confirmed sent
     await logToFirestore({
-      ip, name: name.trim(), email: email.trim(), message: message.trim(), userAgent, status: "SUCCESS", honeypotValue: "",
+      ip, name: name.trim(), email: email.trim(), message: message.trim(), userAgent, status: "SUCCESS", honeypotValue: "", gpsData,
     });
     return { statusCode: 200, body: JSON.stringify({ success: true, message: "Message sent successfully." }) };
   } catch (error) {
     console.error("Email send error:", error);
     await logToFirestore({
-      ip, name: name.trim(), email: email.trim(), message: message.trim(), userAgent, status: "MAIL_ERROR", honeypotValue: "",
+      ip, name: name.trim(), email: email.trim(), message: message.trim(), userAgent, status: "MAIL_ERROR", honeypotValue: "", gpsData,
     });
     return { statusCode: 500, body: JSON.stringify({ error: "Failed to send message. Please try again later." }) };
   }

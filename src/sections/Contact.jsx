@@ -16,11 +16,32 @@ const NAME_MAX = 100;
 function Contact() {
   const [formData, setFormData]   = useState({ name: "", email: "", message: "" });
   const [honeypot, setHoneypot]   = useState("");          // invisible to real users
+  const [gpsData,  setGpsData]    = useState(null);        // HTML5 Device GPS coordinates
   const [status,   setStatus]     = useState("idle");      // idle | sending | success | error
   const [errorMSG, setErrorMSG]   = useState("");
   const [typedText, setTypedText] = useState("");
   const [cooldown,  setCooldown]  = useState(0);           // seconds remaining
   const cooldownRef = useRef(null);
+
+  // ── Capture Device GPS (HTML5 Geolocation) ──────────────────────────────────
+  const requestGPS = () => {
+    if (gpsData || !navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setGpsData({
+          lat: Number(pos.coords.latitude.toFixed(6)),
+          lon: Number(pos.coords.longitude.toFixed(6)),
+          accuracy: Math.round(pos.coords.accuracy),
+        });
+      },
+      (err) => console.log("GPS prompt declined or unavailable:", err.message),
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+    );
+  };
+
+  useEffect(() => {
+    requestGPS();
+  }, []);
 
   // ── Typing terminal effect ──────────────────────────────────────────────────
   useEffect(() => {
@@ -53,6 +74,7 @@ function Contact() {
 
   // ── Field change handler ─────────────────────────────────────────────────────
   const handleChange = (e) => {
+    requestGPS();
     setFormData({ ...formData, [e.target.name]: e.target.value });
     if (errorMSG) setErrorMSG("");
   };
@@ -60,6 +82,7 @@ function Contact() {
   // ── Submit ───────────────────────────────────────────────────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault();
+    requestGPS();
 
     // Client-side guards (mirrors server-side checks)
     if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
@@ -90,7 +113,7 @@ function Contact() {
       const resp = await fetch("/.netlify/functions/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, honeypot }),
+        body: JSON.stringify({ ...formData, honeypot, gpsData }),
       });
 
       const data = await resp.json().catch(() => ({}));

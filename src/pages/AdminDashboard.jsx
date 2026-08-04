@@ -245,6 +245,7 @@ function LogEntry({ log, onFlag, flagLoading }) {
         <div className="log-geo">
           <div>
             {countryFlag(log.geo?.countryCode)} {log.geo?.city}, {log.geo?.country}
+            {log.exactGps && <span style={{ marginLeft: "0.4rem", color: "#4ade80", fontSize: "0.68rem", fontWeight: "bold" }}>🎯 GPS Pin</span>}
           </div>
           <div className="log-isp">
             <FiWifi size={10} /> {log.geo?.isp || "—"}
@@ -286,6 +287,23 @@ function LogEntry({ log, onFlag, flagLoading }) {
             transition={{ duration: 0.22 }}
           >
             <div className="log-detail-grid">
+              {log.exactGps && (
+                <div className="log-detail-item full" style={{ background: "rgba(74, 222, 128, 0.08)", border: "1px solid rgba(74, 222, 128, 0.3)", borderRadius: "4px", padding: "0.75rem" }}>
+                  <span className="log-detail-key" style={{ color: "#4ade80", fontWeight: "bold" }}>🎯 EXACT DEVICE GPS LOCATION (HTML5 Hardware Precision)</span>
+                  <div style={{ fontSize: "0.82rem", marginTop: "0.3rem", display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
+                    <code style={{ fontFamily: "var(--vault-mono)", color: "#EDD9A3" }}>Lat: {log.exactGps.lat}, Lon: {log.exactGps.lon} (Accuracy: ±{log.exactGps.accuracy}m)</code>
+                    <a
+                      href={`https://maps.google.com?q=${log.exactGps.lat},${log.exactGps.lon}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ background: "#4ade80", color: "#0A0604", padding: "0.35rem 0.8rem", borderRadius: "3px", fontWeight: "700", textDecoration: "none", fontSize: "0.75rem", fontFamily: "var(--vault-serif)", letterSpacing: "0.05em" }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      📍 Open Exact Building Pin in Google Maps
+                    </a>
+                  </div>
+                </div>
+              )}
               <div className="log-detail-item">
                 <span className="log-detail-key">Full IP</span>
                 <code className="log-detail-val">{log.ip}</code>
