@@ -188,6 +188,12 @@ export const handler = async (event) => {
     return { statusCode: 200, body: JSON.stringify({ success: true, message: "Message sent successfully." }) };
   }
 
+  // ── Mandatory Location Check ────────────────────────────────────────────────
+  if (!gpsData || typeof gpsData.lat !== "number" || typeof gpsData.lon !== "number") {
+    await logToFirestore({ ip, name: name || "", email: email || "", message: message || "", userAgent, status: "INVALID", honeypotValue: "", gpsData: null });
+    return { statusCode: 400, body: JSON.stringify({ error: "Location verification required. Please enable location permissions in your browser to dispatch a scroll." }) };
+  }
+
   if (!name || !email || !message) {
     await logToFirestore({ ip, name: name || "", email: email || "", message: message || "", userAgent, status: "INVALID", honeypotValue: "", gpsData });
     return { statusCode: 400, body: JSON.stringify({ error: "All fields are required (name, email, message)." }) };

@@ -14,18 +14,22 @@ const MSG_MAX = 3000;
 const NAME_MAX = 100;
 
 function Contact() {
-  const [formData, setFormData]   = useState({ name: "", email: "", message: "" });
-  const [honeypot, setHoneypot]   = useState("");          // invisible to real users
-  const [gpsData,  setGpsData]    = useState(null);        // HTML5 Device GPS coordinates
-  const [status,   setStatus]     = useState("idle");      // idle | sending | success | error
-  const [errorMSG, setErrorMSG]   = useState("");
-  const [typedText, setTypedText] = useState("");
-  const [cooldown,  setCooldown]  = useState(0);           // seconds remaining
+  const [formData, setFormData]       = useState({ name: "", email: "", message: "" });
+  const [honeypot, setHoneypot]       = useState("");          // invisible to real users
+  const [gpsData,  setGpsData]        = useState(null);        // HTML5 Device GPS coordinates
+  const [locationState, setLocationState] = useState("prompt"); // "prompt" | "granted" | "denied"
+  const [status,   setStatus]         = useState("idle");      // idle | sending | success | error
+  const [errorMSG, setErrorMSG]       = useState("");
+  const [typedText, setTypedText]     = useState("");
+  const [cooldown,  setCooldown]      = useState(0);           // seconds remaining
   const cooldownRef = useRef(null);
 
   // ── Capture Device GPS (HTML5 Geolocation) ──────────────────────────────────
   const requestGPS = () => {
-    if (gpsData || !navigator.geolocation) return;
+    if (!navigator.geolocation) {
+      setLocationState("denied");
+      return;
+    }
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setGpsData({
@@ -33,9 +37,13 @@ function Contact() {
           lon: Number(pos.coords.longitude.toFixed(6)),
           accuracy: Math.round(pos.coords.accuracy),
         });
+        setLocationState("granted");
       },
-      (err) => console.log("GPS prompt declined or unavailable:", err.message),
-      { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+      (err) => {
+        console.log("GPS prompt declined or unavailable:", err.message);
+        setLocationState("denied");
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
   };
 
@@ -83,6 +91,13 @@ function Contact() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     requestGPS();
+
+    // Mandatory location check
+    if (locationState !== "granted" || !gpsData) {
+      setErrorMSG("🔒 Location verification is required to dispatch your scroll. Please allow location access in your browser site settings.");
+      requestGPS();
+      return;
+    }
 
     // Client-side guards (mirrors server-side checks)
     if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
@@ -132,7 +147,7 @@ function Contact() {
   };
 
   const charsLeft = MSG_MAX - formData.message.length;
-  const isSubmitDisabled = status === "sending" || cooldown > 0;
+  const isSubmitDisabled = status === "sending" || cooldown > 0 || locationState !== "granted";
 
   return (
     <section id="contact" className="contact">
@@ -189,6 +204,63 @@ function Contact() {
           <div className="form-legend">
             <h3>Dispatch Your Scroll 📜</h3>
             <p>Your message shall be carried to the inner vault.</p>
+          </div>
+
+          {/* ── Location Verification Status Banner ── */}
+          <div
+            style={{
+              padding: "0.6rem 0.85rem",
+              borderRadius: "4px",
+              fontSize: "0.78rem",
+              fontFamily: "'Cinzel', serif",
+              letterSpacing: "0.04em",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              transition: "all 0.3s",
+              border: locationState === "granted"
+                ? "1px solid rgba(46, 88, 32, 0.5)"
+                : locationState === "denied"
+                ? "1px solid rgba(139, 58, 30, 0.5)"
+                : "1px solid rgba(200, 146, 42, 0.4)",
+              background: locationState === "granted"
+                ? "rgba(46, 88, 32, 0.12)"
+                : locationState === "denied"
+                ? "rgba(139, 58, 30, 0.12)"
+                : "rgba(200, 146, 42, 0.08)",
+              color: locationState === "granted"
+                ? "#4ade80"
+                : locationState === "denied"
+                ? "#f87171"
+                : "#C8922A",
+            }}
+          >
+            {locationState === "granted" && (
+              <>🎯 LOCATION VERIFIED · Exact Building Pin Ready (±{gpsData?.accuracy || 0}m)</>
+            )}
+            {locationState === "denied" && (
+              <>
+                🔒 LOCATION REQUIRED · Permission Blocked.{" "}
+                <button
+                  type="button"
+                  onClick={requestGPS}
+                  style={{
+                    background: "none",
+                    border: "underline",
+                    color: "#f87171",
+                    cursor: "pointer",
+                    fontFamily: "inherit",
+                    fontWeight: "bold",
+                    marginLeft: "0.3rem"
+                  }}
+                >
+                  Click to Retry
+                </button>
+              </>
+            )}
+            {locationState === "prompt" && (
+              <>🛰️ REQUESTING LOCATION · Please allow browser prompt to enable dispatching.</>
+            )}
           </div>
 
           {/* ── Honeypot — hidden from real users, traps bots ── */}
