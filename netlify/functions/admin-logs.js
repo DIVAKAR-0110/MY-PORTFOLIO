@@ -1,16 +1,32 @@
 import { initializeApp, cert, getApps, getApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 
+// ── Private Key Normalizer ───────────────────────────────────────────────────
+function parsePrivateKey(key) {
+  if (!key) return undefined;
+  // Remove wrapping quotes if user included them in Netlify UI
+  let formatted = key.trim().replace(/^["']|["']$/g, "");
+  // Convert literal \n to actual newlines
+  formatted = formatted.replace(/\\n/g, "\n");
+  return formatted;
+}
+
 // ── Firebase Admin (singleton) ────────────────────────────────────────────────
 function getDB() {
+  const projectId   = process.env.FIREBASE_PROJECT_ID;
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+  const privateKey  = parsePrivateKey(process.env.FIREBASE_PRIVATE_KEY);
+
+  if (!projectId || !clientEmail || !privateKey) {
+    throw new Error(
+      `Missing Firebase environment variables! Received: projectId=${!!projectId}, clientEmail=${!!clientEmail}, privateKey=${!!privateKey}`
+    );
+  }
+
   const app =
     getApps().length === 0
       ? initializeApp({
-          credential: cert({
-            projectId:   process.env.FIREBASE_PROJECT_ID,
-            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-            privateKey:  process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-          }),
+          credential: cert({ projectId, clientEmail, privateKey }),
         })
       : getApp();
   return getFirestore(app);
@@ -25,7 +41,6 @@ function isAuthorized(event) {
 
 // ── Handler ───────────────────────────────────────────────────────────────────
 export const handler = async (event) => {
-  // CORS headers for preflight (admin page is same origin in prod, but useful for local dev)
   const cors = {
     "Access-Control-Allow-Origin":  "*",
     "Access-Control-Allow-Headers": "Authorization, Content-Type",
@@ -45,34 +60,33 @@ export const handler = async (event) => {
     };
   }
 
-  const db = getDB();
-
   // ════════════════════════════════════════════════════════════════════════════
   // GET — Fetch all logs + IP summaries
   // ════════════════════════════════════════════════════════════════════════════
   if (event.httpMethod === "GET") {
     try {
-      const params  = event.queryStringParameters || {};
+      const db = getDB();
+      const params = event.queryStringParameters || {};
       const { status, flagged, limit = "500" } = params;
 
-      // Fetch up to `limit` logs ordered by timestamp desc
-      // No composite index needed — filter in memory
-      const logsSnap = await db
-        .collection("contact_logs")
-        .orderBy("timestamp", "desc")
-        .limit(parseInt(limit, 10))
-        .get();
+      // Fetch docs without orderBy to avoid index errors, sort in memory
+      const logsSnap = await db.collection("contact_logs").get();
+      let logs = logsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 
-      let logs = logsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      // Sort newest first
+      logs.sort((a, b) => (b.timestamp || "").localeCompare(a.timestamp || ""));
 
-      // In-memory filters (avoids needing composite Firestore indexes)
-      if (status)          logs = logs.filter(l => l.status  === status);
-      if (flagged === "true") logs = logs.filter(l => l.flagged === true);
+      // Limit results
+      logs = logs.slice(0, parseInt(limit, 10));
 
-      // Fetch ALL ip_summary docs (usually < 1000 for a portfolio) then sort in memory
+      // In-memory filters
+      if (status)          logs = logs.filter((l) => l.status === status);
+      if (flagged === "true") logs = logs.filter((l) => l.flagged === true);
+
+      // Fetch IP summaries
       const ipSnap = await db.collection("ip_summary").get();
       const ipSummaries = ipSnap.docs
-        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .map((doc) => ({ id: doc.id, ...doc.data() }))
         .sort((a, b) => (b.totalSubmissions || 0) - (a.totalSubmissions || 0));
 
       return {
@@ -85,16 +99,17 @@ export const handler = async (event) => {
       return {
         statusCode: 500,
         headers: cors,
-        body: JSON.stringify({ error: "Failed to fetch logs." }),
+        body: JSON.stringify({ error: `Failed to fetch logs: ${err.message}` }),
       };
     }
   }
 
   // ════════════════════════════════════════════════════════════════════════════
-  // PATCH — Toggle flagged status for an IP (and all its log entries)
+  // PATCH — Toggle flagged status for an IP
   // ════════════════════════════════════════════════════════════════════════════
   if (event.httpMethod === "PATCH") {
     try {
+      const db = getDB();
       const { ip, flagged } = JSON.parse(event.body || "{}");
       if (!ip) {
         return { statusCode: 400, headers: cors, body: JSON.stringify({ error: "ip is required." }) };
@@ -102,17 +117,15 @@ export const handler = async (event) => {
 
       const ipKey = ip.replace(/[.:]/g, "_");
 
-      // Update ip_summary
       await db.collection("ip_summary").doc(ipKey).update({ flagged });
 
-      // Update all contact_logs from this IP in batches of 500 (Firestore batch limit)
       const logsSnap = await db.collection("contact_logs").where("ip", "==", ip).get();
       const docs     = logsSnap.docs;
       const BATCH_SIZE = 490;
 
       for (let i = 0; i < docs.length; i += BATCH_SIZE) {
         const batch = db.batch();
-        docs.slice(i, i + BATCH_SIZE).forEach(doc => batch.update(doc.ref, { flagged }));
+        docs.slice(i, i + BATCH_SIZE).forEach((doc) => batch.update(doc.ref, { flagged }));
         await batch.commit();
       }
 
@@ -126,7 +139,7 @@ export const handler = async (event) => {
       return {
         statusCode: 500,
         headers: cors,
-        body: JSON.stringify({ error: "Failed to update flag." }),
+        body: JSON.stringify({ error: `Failed to update flag: ${err.message}` }),
       };
     }
   }

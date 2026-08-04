@@ -2,17 +2,29 @@ import nodemailer from "nodemailer";
 import { initializeApp, cert, getApps, getApp } from "firebase-admin/app";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
 
+// ── Private Key Normalizer ───────────────────────────────────────────────────
+function parsePrivateKey(key) {
+  if (!key) return undefined;
+  let formatted = key.trim().replace(/^["']|["']$/g, "");
+  return formatted.replace(/\\n/g, "\n");
+}
+
 // ── Firebase Admin (singleton — safe for warm serverless starts) ──────────────
 function getDB() {
+  const projectId   = process.env.FIREBASE_PROJECT_ID;
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+  const privateKey  = parsePrivateKey(process.env.FIREBASE_PRIVATE_KEY);
+
+  if (!projectId || !clientEmail || !privateKey) {
+    throw new Error(
+      `Missing Firebase environment variables! Received: projectId=${!!projectId}, clientEmail=${!!clientEmail}, privateKey=${!!privateKey}`
+    );
+  }
+
   const app =
     getApps().length === 0
       ? initializeApp({
-          credential: cert({
-            projectId:   process.env.FIREBASE_PROJECT_ID,
-            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-            // Netlify strips real newlines from multi-line env vars — restore them
-            privateKey:  process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-          }),
+          credential: cert({ projectId, clientEmail, privateKey }),
         })
       : getApp();
   return getFirestore(app);
