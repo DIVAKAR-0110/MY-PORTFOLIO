@@ -346,11 +346,14 @@ export default function AdminDashboard() {
   const [livePulse,    setLivePulse]    = useState(true);
   const intervalRef = useRef(null);
 
+  const [fetchError, setFetchError] = useState("");
+
   // ── Fetch logs from admin-logs function ──────────────────────────────────────
   const fetchLogs = useCallback(
     async (t = token) => {
       if (!t) return;
       setLoading(true);
+      setFetchError("");
       try {
         const qs = new URLSearchParams();
         if (filters.status)  qs.set("status",  filters.status);
@@ -367,12 +370,19 @@ export default function AdminDashboard() {
         }
 
         const data = await resp.json();
+        if (!resp.ok) {
+          setFetchError(data.error || "Failed to connect to Intel Vault backend.");
+          setLoading(false);
+          return;
+        }
+
         setLogs(data.logs         || []);
         setIpSummaries(data.ipSummaries || []);
         setLastRefresh(new Date());
         setLivePulse((p) => !p); // toggle to animate live dot
       } catch (err) {
         console.error("fetchLogs error:", err);
+        setFetchError("Network error while connecting to serverless function.");
       }
       setLoading(false);
     },
@@ -563,6 +573,26 @@ export default function AdminDashboard() {
           </button>
         )}
       </div>
+
+      {/* ── Error Banner ── */}
+      {fetchError && (
+        <div style={{
+          background: "rgba(248, 113, 113, 0.12)",
+          borderBottom: "1px solid rgba(248, 113, 113, 0.4)",
+          color: "#f87171",
+          padding: "0.85rem 1.5rem",
+          display: "flex",
+          alignItems: "center",
+          gap: "0.75rem",
+          fontSize: "0.85rem",
+          fontFamily: "'Share Tech Mono', monospace"
+        }}>
+          <FiAlertTriangle size={18} style={{ flexShrink: 0 }} />
+          <div>
+            <strong>SERVER DIAGNOSTIC ERROR:</strong> {fetchError}
+          </div>
+        </div>
+      )}
 
       {/* ── Main Content ── */}
       <div className="vault-body">
