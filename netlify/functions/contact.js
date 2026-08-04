@@ -10,7 +10,15 @@ function parsePrivateKey(key) {
 }
 
 // ── Firebase Admin (singleton — safe for warm serverless starts) ──────────────
-function getDB() {
+function getCredentials() {
+  if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
+    let str = process.env.FIREBASE_SERVICE_ACCOUNT_JSON.trim();
+    if (!str.startsWith("{")) {
+      str = Buffer.from(str, "base64").toString("utf-8");
+    }
+    return cert(JSON.parse(str));
+  }
+
   const projectId   = process.env.FIREBASE_PROJECT_ID;
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
   const privateKey  = parsePrivateKey(process.env.FIREBASE_PRIVATE_KEY);
@@ -21,10 +29,14 @@ function getDB() {
     );
   }
 
+  return cert({ projectId, clientEmail, privateKey });
+}
+
+function getDB() {
   const app =
     getApps().length === 0
       ? initializeApp({
-          credential: cert({ projectId, clientEmail, privateKey }),
+          credential: getCredentials(),
         })
       : getApp();
   return getFirestore(app);
